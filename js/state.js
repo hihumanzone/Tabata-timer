@@ -11,7 +11,7 @@ export const State = {
     timer: {
         interval: null,
         wakeLock: null,
-        state: 'stopped', // stopped, running, paused
+        state: 'stopped',
         currentWorkout: null,
         executionQueue: [],
         currentIndex: -1,

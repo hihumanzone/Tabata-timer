@@ -5,12 +5,10 @@ import { State } from './state.js';
  */
 export const EventListeners = {
     init() {
-        // Setup
         window.UI.elements.setupForm.addEventListener('submit', this.handleSetupSubmit);
         window.UI.elements.setupForm.addEventListener('change', this.handleThemePreview);
         window.UI.elements.importSetupBtn.addEventListener('click', () => window.UI.elements.importUserDataInput.click());
 
-        // Home Screen
         window.UI.elements.newWorkoutBtn.addEventListener('click', () => window.UI.openEditor());
         window.UI.elements.importWorkoutBtn.addEventListener('click', () => window.UI.elements.importWorkoutFileInput.click());
         window.UI.elements.importWorkoutFileInput.addEventListener('change', this.handleImportWorkoutFile);
@@ -18,24 +16,20 @@ export const EventListeners = {
         window.UI.elements.searchBar.addEventListener('input', () => window.UI.renderWorkouts());
         window.UI.elements.sortSelect.addEventListener('change', () => window.UI.renderWorkouts());
 
-        // Event Delegation for dynamic content
         window.UI.elements.workoutList.addEventListener('click', this.handleWorkoutCardAction);
         window.UI.elements.stepsList.addEventListener('click', this.handleStepAction);
         
-        // Editor
         window.UI.elements.saveWorkoutBtn.addEventListener('click', () => window.WorkoutManager.save());
         window.UI.elements.cancelEditorBtn.addEventListener('click', () => window.UI.closeEditor());
         window.UI.elements.addWorkStepBtn.addEventListener('click', () => window.UI.addStepToEditor('work'));
         window.UI.elements.addRestStepBtn.addEventListener('click', () => window.UI.addStepToEditor('rest'));
         
-        // Modals & User Data
         window.UI.elements.mainSettingsForm.addEventListener('submit', this.handleSaveSettings);
         document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', () => window.UI.closeAllModals()));
         window.UI.elements.exportUserDataBtn.addEventListener('click', () => window.UserDataManager.export());
         window.UI.elements.importUserDataBtn.addEventListener('click', () => window.UI.elements.importUserDataInput.click());
         window.UI.elements.importUserDataInput.addEventListener('change', (e) => this.handleImportUserDataFile(e));
 
-        // Timer
         window.UI.elements.timerPauseResumeBtn.addEventListener('click', () => window.Timer.pauseResume());
         window.UI.elements.timerQuitBtn.addEventListener('click', () => window.Timer.quit());
         window.UI.elements.timerDoneBtn.addEventListener('click', () => window.Timer.runNextStep());
@@ -89,20 +83,132 @@ export const EventListeners = {
         if (actions[action]) actions[action]();
     },
     
+    updateStepButtonVisibility() {
+        const stepItems = document.querySelectorAll('#stepsList .step-item');
+        stepItems.forEach((stepEl, index) => {
+            const moveUpBtn = stepEl.querySelector('[data-action="move-up"]');
+            const moveDownBtn = stepEl.querySelector('[data-action="move-down"]');
+            
+            if (index === 0) {
+                moveUpBtn.classList.add('hidden');
+                moveUpBtn.setAttribute('aria-hidden', 'true');
+            } else {
+                moveUpBtn.classList.remove('hidden');
+                moveUpBtn.setAttribute('aria-hidden', 'false');
+            }
+            
+            if (index === stepItems.length - 1) {
+                moveDownBtn.classList.add('hidden');
+                moveDownBtn.setAttribute('aria-hidden', 'true');
+            } else {
+                moveDownBtn.classList.remove('hidden');
+                moveDownBtn.setAttribute('aria-hidden', 'false');
+            }
+        });
+    },
+    
     handleStepAction(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
         const target = e.target.closest('[data-action]');
         if (!target) return;
 
         const stepEl = target.closest('.step-item');
         const action = target.dataset.action;
         
-        if (action === 'move-up' && stepEl.previousElementSibling) {
-            stepEl.parentNode.insertBefore(stepEl, stepEl.previousElementSibling);
-        } else if (action === 'move-down' && stepEl.nextElementSibling) {
-            stepEl.parentNode.insertBefore(stepEl.nextElementSibling, stepEl);
-        } else if (action === 'delete') {
-            stepEl.remove();
+        if (action === 'delete') {
+            stepEl.style.transform = 'scale(0.95)';
+            stepEl.style.opacity = '0';
+            setTimeout(() => {
+                stepEl.remove();
+                window.EventListeners.updateStepButtonVisibility();
+            }, 300);
+            return;
         }
+        
+        if (action === 'move-up' || action === 'move-down') {
+            window.EventListeners.simpleStepReorder(stepEl, action);
+        }
+    },
+
+    simpleStepReorder(stepEl, direction) {
+        const targetSibling = direction === 'move-up' ? stepEl.previousElementSibling : stepEl.nextElementSibling;
+        if (!targetSibling) return;
+        
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        const stepData = window.EventListeners.extractStepFormData(stepEl);
+        const targetData = window.EventListeners.extractStepFormData(targetSibling);
+        
+        stepEl.style.transition = 'transform 0.2s ease, background-color 0.2s ease';
+        stepEl.style.transform = 'scale(1.02)';
+        stepEl.style.backgroundColor = 'color-mix(in srgb, var(--bg-tertiary), var(--accent-primary) 8%)';
+        
+        if (direction === 'move-up') {
+            stepEl.parentNode.insertBefore(stepEl, targetSibling);
+        } else {
+            stepEl.parentNode.insertBefore(targetSibling, stepEl);
+        }
+        
+        window.EventListeners.restoreStepFormData(stepEl, stepData);
+        window.EventListeners.restoreStepFormData(targetSibling, targetData);
+        
+        setTimeout(() => {
+            stepEl.style.transform = '';
+            stepEl.style.backgroundColor = '';
+            setTimeout(() => {
+                stepEl.style.transition = '';
+            }, 200);
+        }, 150);
+        
+        window.EventListeners.updateStepButtonVisibility();
+        
+        window.scrollTo({
+            top: scrollTop,
+            behavior: 'auto'
+        });
+        
+        const stepName = stepData.name || 'Unnamed step';
+        const announcement = `${stepName} moved ${direction === 'move-up' ? 'up' : 'down'}`;
+        window.EventListeners.announceToScreenReader(announcement);
+    },
+
+
+
+    extractStepFormData(stepEl) {
+        return {
+            name: stepEl.querySelector('.step-name').value,
+            description: stepEl.querySelector('.step-description').value,
+            duration: stepEl.querySelector('.step-duration').value,
+            reps: stepEl.querySelector('.step-reps').value,
+            media: stepEl.querySelector('.step-media').value
+        };
+    },
+
+    restoreStepFormData(stepEl, data) {
+        stepEl.querySelector('.step-name').value = data.name;
+        stepEl.querySelector('.step-description').value = data.description;
+        stepEl.querySelector('.step-duration').value = data.duration;
+        stepEl.querySelector('.step-reps').value = data.reps;
+        stepEl.querySelector('.step-media').value = data.media;
+    },
+
+    announceToScreenReader(message) {
+        let announcer = document.getElementById('step-announcer');
+        if (!announcer) {
+            announcer = document.createElement('div');
+            announcer.id = 'step-announcer';
+            announcer.setAttribute('aria-live', 'polite');
+            announcer.setAttribute('aria-atomic', 'true');
+            announcer.style.position = 'absolute';
+            announcer.style.left = '-10000px';
+            announcer.style.width = '1px';
+            announcer.style.height = '1px';
+            announcer.style.overflow = 'hidden';
+            document.body.appendChild(announcer);
+        }
+        announcer.textContent = message;
     },
 
     openMainSettings() {

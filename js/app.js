@@ -13,7 +13,6 @@ import { EventListeners } from './event-listeners.js';
  */
 export const App = {
     init() {
-        // Make modules available globally for cross-module communication
         window.UI = UI;
         window.State = State;
         window.Config = Config;
@@ -38,10 +37,8 @@ export const App = {
     }
 };
 
-// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
     
-    // Debug function
     window.debugViewport = () => ViewportManager.logViewportInfo();
 });

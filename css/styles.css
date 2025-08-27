@@ -322,11 +322,15 @@ input:focus, select:focus, textarea:focus {
     margin-bottom: 1rem;
     border-left: 4px solid;
 }
+
 .step-item[data-type="work"] { border-color: var(--color-orange); }
 .step-item[data-type="rest"] { border-color: var(--color-green); }
 .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .step-header h4 { text-transform: capitalize; }
-.step-controls button { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary); padding: 0.25rem; }
+.step-controls button { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary); padding: 0.25rem; transition: opacity 0.2s ease-in-out; }
+.step-controls button:hover { color: var(--text-primary); }
+.step-controls button:disabled { opacity: 0.3; cursor: not-allowed; }
+.step-controls button.hidden { opacity: 0; pointer-events: none; }
 
 /* --- Timer Screen --- */
 #timerScreen {

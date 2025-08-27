@@ -36,7 +36,6 @@ export const UI = {
     },
 
     renderWorkouts() {
-        // This will be imported when needed
         this.elements.workoutList.innerHTML = '';
         const workoutsToRender = window.WorkoutManager.getFilteredAndSorted();
         
@@ -114,6 +113,8 @@ export const UI = {
         stepEl.querySelector('.step-media').value = data.media || '';
 
         this.elements.stepsList.appendChild(stepEl);
+        
+        window.EventListeners.updateStepButtonVisibility();
     },
 
     buildColorSelector() {
