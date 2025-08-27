@@ -122,8 +122,13 @@ export const Timer = {
         }
     },
 
-    quit() {
-        if (confirm('Are you sure you want to quit this workout?')) {
+    async quit() {
+        const confirmed = await window.Modal.confirm(
+            'Are you sure you want to quit this workout?',
+            'Quit Workout'
+        );
+        
+        if (confirmed) {
             clearInterval(State.timer.interval);
             this.releaseWakeLock();
             State.timer.state = 'stopped';
@@ -135,7 +140,7 @@ export const Timer = {
     finish() {
         clearInterval(State.timer.interval);
         this.releaseWakeLock();
-        alert('Workout Complete!');
+        window.Notifications.success('Workout Complete! Great job!');
         State.timer.state = 'stopped';
         window.UI.hide(window.UI.elements.timerScreen);
         window.UI.show(window.UI.elements.homeScreen);

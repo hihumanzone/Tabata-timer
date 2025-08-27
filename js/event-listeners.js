@@ -232,7 +232,7 @@ export const EventListeners = {
     handleFullscreenToggle() {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(err => {
-                alert(`Error enabling full-screen: ${err.message}`);
+                window.Notifications.error(`Error enabling full-screen: ${err.message}`);
             });
         } else {
             document.exitFullscreen();
