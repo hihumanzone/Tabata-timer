@@ -35,12 +35,12 @@ export const UserDataManager = {
                         window.UI.hide(window.UI.elements.setupScreen);
                         window.UI.show(window.UI.elements.homeScreen);
                     }
-                    alert('User data imported successfully!');
+                    window.Notifications.success('User data imported successfully!');
                 } else {
-                    alert('Invalid user data file format.');
+                    window.Notifications.error('Invalid user data file format.');
                 }
             } catch (err) {
-                alert('Error reading file. Make sure it is a valid JSON.');
+                window.Notifications.error('Error reading file. Make sure it is a valid JSON.');
             }
         };
         reader.readAsText(file);

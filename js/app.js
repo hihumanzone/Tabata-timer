@@ -6,6 +6,9 @@ import { Timer } from './timer.js';
 import { WorkoutManager } from './workout-manager.js';
 import { UserDataManager } from './user-data-manager.js';
 import { EventListeners } from './event-listeners.js';
+import { Modal } from './modal.js';
+import { Notifications } from './notifications.js';
+import { Dropdown } from './dropdown.js';
 
 /**
  * Main application entry point.
@@ -21,11 +24,18 @@ export const App = {
         window.UserDataManager = UserDataManager;
         window.EventListeners = EventListeners;
         window.ViewportManager = ViewportManager;
+        window.Modal = Modal;
+        window.Notifications = Notifications;
+        window.Dropdown = Dropdown;
 
         ViewportManager.init();
         UI.cacheDOMElements();
         State.load();
         EventListeners.init();
+        
+        // Initialize custom components
+        Notifications.init();
+        Dropdown.replaceAll();
 
         if (!State.settings.username) {
             UI.show(UI.elements.setupScreen);
@@ -39,6 +49,4 @@ export const App = {
 
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
-    
-    window.debugViewport = () => ViewportManager.logViewportInfo();
 });

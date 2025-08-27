@@ -39,7 +39,7 @@ export const WorkoutManager = {
         const title = window.UI.elements.workoutTitle.value.trim();
 
         if (!title) {
-            alert('Workout title cannot be empty.');
+            window.Notifications.error('Workout title cannot be empty.');
             return;
         }
         
@@ -47,7 +47,7 @@ export const WorkoutManager = {
             w => w.title.toLowerCase() === title.toLowerCase() && w.id !== id
         );
         if (isTitleDuplicate) {
-            alert('A workout with this title already exists. Please choose a unique title.');
+            window.Notifications.error('A workout with this title already exists. Please choose a unique title.');
             return;
         }
 
@@ -74,7 +74,7 @@ export const WorkoutManager = {
         };
         
         if (workoutData.sets < 1 || workoutData.steps.length === 0) {
-            alert('Please have at least 1 Set and add at least one Step.');
+            window.Notifications.error('Please have at least 1 Set and add at least one Step.');
             return;
         }
 
@@ -122,11 +122,17 @@ export const WorkoutManager = {
         }
     },
     
-    delete(id) {
-        if (confirm('Are you sure you want to delete this workout?')) {
+    async delete(id) {
+        const confirmed = await window.Modal.confirm(
+            'Are you sure you want to delete this workout? This action cannot be undone.',
+            'Delete Workout'
+        );
+        
+        if (confirmed) {
             State.workouts = State.workouts.filter(w => w.id !== id);
             State.save();
             window.UI.renderWorkouts();
+            window.Notifications.success('Workout deleted successfully.');
         }
     },
 
@@ -157,12 +163,12 @@ export const WorkoutManager = {
                     State.workouts.push(workout);
                     State.save();
                     window.UI.renderWorkouts();
-                    alert('Workout imported successfully!');
+                    window.Notifications.success('Workout imported successfully!');
                 } else {
-                    alert('Invalid workout file format.');
+                    window.Notifications.error('Invalid workout file format.');
                 }
             } catch (err) {
-                alert('Error reading file. Make sure it is a valid JSON.');
+                window.Notifications.error('Error reading file. Make sure it is a valid JSON.');
             }
         };
         reader.readAsText(file);

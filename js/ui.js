@@ -198,6 +198,14 @@ export const UI = {
     },
 
     closeAllModals() {
+        // Check if settings modal is open and revert theme if needed
+        const settingsModal = document.getElementById('mainSettingsModal');
+        if (settingsModal && !settingsModal.classList.contains('hidden')) {
+            if (window.EventListeners.originalTheme && document.body.dataset.theme !== window.EventListeners.originalTheme) {
+                document.body.dataset.theme = window.EventListeners.originalTheme;
+            }
+        }
+        
         document.querySelectorAll('.modal-overlay').forEach(modal => this.hide(modal));
     }
 };
