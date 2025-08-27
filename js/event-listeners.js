@@ -206,38 +206,43 @@ export const EventListeners = {
                     stepEl.parentNode.insertBefore(targetSibling, stepEl);
                 }
                 
-                // Phase 4: Clean up slide transforms immediately after DOM manipulation
-                stepEl.classList.remove('slide-up', 'slide-down');
-                targetSibling.classList.remove('slide-up', 'slide-down');
-                
-                // Phase 5: Allow elements to settle in new positions
-                setTimeout(() => {
-                    // Restore form data
-                    window.EventListeners.restoreStepFormData(stepEl, stepData);
-                    window.EventListeners.restoreStepFormData(targetSibling, targetData);
-                    
-                    // Phase 6: Final cleanup and state updates
-                    setTimeout(() => {
-                        // Clean up all animation classes
-                        stepEl.classList.remove('moving', 'animating');
-                        targetSibling.classList.remove('animating', 'target-sliding');
+                // Phase 4: Allow DOM to fully settle before removing transforms
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        // Now safely remove slide transforms after DOM has settled
+                        stepEl.classList.remove('slide-up', 'slide-down');
+                        targetSibling.classList.remove('slide-up', 'slide-down');
                         
-                        // Update button visibility after reordering
-                        window.EventListeners.updateStepButtonVisibility();
-                        
-                        // Restore scroll position to prevent jumping
-                        window.scrollTo({
-                            top: scrollTop,
-                            behavior: 'auto' // Use auto to prevent additional animation conflicts
-                        });
-                        
-                        // Announce change to screen readers
-                        const stepName = stepData.name || 'Unnamed step';
-                        const announcement = `${stepName} moved ${direction === 'move-up' ? 'up' : 'down'}`;
-                        window.EventListeners.announceToScreenReader(announcement);
-                    }, 100); // Allow time for form data restoration
-                    
-                }, 50); // Brief delay for DOM settling
+                        // Phase 5: Restore form data and finalize
+                        setTimeout(() => {
+                            // Restore form data
+                            window.EventListeners.restoreStepFormData(stepEl, stepData);
+                            window.EventListeners.restoreStepFormData(targetSibling, targetData);
+                            
+                            // Phase 6: Final cleanup and state updates
+                            setTimeout(() => {
+                                // Clean up all animation classes
+                                stepEl.classList.remove('moving', 'animating');
+                                targetSibling.classList.remove('animating', 'target-sliding');
+                                
+                                // Update button visibility after reordering
+                                window.EventListeners.updateStepButtonVisibility();
+                                
+                                // Restore scroll position to prevent jumping
+                                window.scrollTo({
+                                    top: scrollTop,
+                                    behavior: 'auto' // Use auto to prevent additional animation conflicts
+                                });
+                                
+                                // Announce change to screen readers
+                                const stepName = stepData.name || 'Unnamed step';
+                                const announcement = `${stepName} moved ${direction === 'move-up' ? 'up' : 'down'}`;
+                                window.EventListeners.announceToScreenReader(announcement);
+                            }, 50); // Reduced timing for faster cleanup
+                            
+                        }, 50); // Brief delay for DOM settling
+                    });
+                });
                 
             }, 600); // Match the CSS transition duration (600ms)
             
