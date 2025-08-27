@@ -5,12 +5,10 @@ import { State } from './state.js';
  */
 export const EventListeners = {
     init() {
-        // Setup
         window.UI.elements.setupForm.addEventListener('submit', this.handleSetupSubmit);
         window.UI.elements.setupForm.addEventListener('change', this.handleThemePreview);
         window.UI.elements.importSetupBtn.addEventListener('click', () => window.UI.elements.importUserDataInput.click());
 
-        // Home Screen
         window.UI.elements.newWorkoutBtn.addEventListener('click', () => window.UI.openEditor());
         window.UI.elements.importWorkoutBtn.addEventListener('click', () => window.UI.elements.importWorkoutFileInput.click());
         window.UI.elements.importWorkoutFileInput.addEventListener('change', this.handleImportWorkoutFile);
@@ -18,24 +16,20 @@ export const EventListeners = {
         window.UI.elements.searchBar.addEventListener('input', () => window.UI.renderWorkouts());
         window.UI.elements.sortSelect.addEventListener('change', () => window.UI.renderWorkouts());
 
-        // Event Delegation for dynamic content
         window.UI.elements.workoutList.addEventListener('click', this.handleWorkoutCardAction);
         window.UI.elements.stepsList.addEventListener('click', this.handleStepAction);
         
-        // Editor
         window.UI.elements.saveWorkoutBtn.addEventListener('click', () => window.WorkoutManager.save());
         window.UI.elements.cancelEditorBtn.addEventListener('click', () => window.UI.closeEditor());
         window.UI.elements.addWorkStepBtn.addEventListener('click', () => window.UI.addStepToEditor('work'));
         window.UI.elements.addRestStepBtn.addEventListener('click', () => window.UI.addStepToEditor('rest'));
         
-        // Modals & User Data
         window.UI.elements.mainSettingsForm.addEventListener('submit', this.handleSaveSettings);
         document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', () => window.UI.closeAllModals()));
         window.UI.elements.exportUserDataBtn.addEventListener('click', () => window.UserDataManager.export());
         window.UI.elements.importUserDataBtn.addEventListener('click', () => window.UI.elements.importUserDataInput.click());
         window.UI.elements.importUserDataInput.addEventListener('change', (e) => this.handleImportUserDataFile(e));
 
-        // Timer
         window.UI.elements.timerPauseResumeBtn.addEventListener('click', () => window.Timer.pauseResume());
         window.UI.elements.timerQuitBtn.addEventListener('click', () => window.Timer.quit());
         window.UI.elements.timerDoneBtn.addEventListener('click', () => window.Timer.runNextStep());
@@ -95,7 +89,6 @@ export const EventListeners = {
             const moveUpBtn = stepEl.querySelector('[data-action="move-up"]');
             const moveDownBtn = stepEl.querySelector('[data-action="move-down"]');
             
-            // Hide move-up button for first step
             if (index === 0) {
                 moveUpBtn.classList.add('hidden');
                 moveUpBtn.setAttribute('aria-hidden', 'true');
@@ -104,7 +97,6 @@ export const EventListeners = {
                 moveUpBtn.setAttribute('aria-hidden', 'false');
             }
             
-            // Hide move-down button for last step
             if (index === stepItems.length - 1) {
                 moveDownBtn.classList.add('hidden');
                 moveDownBtn.setAttribute('aria-hidden', 'true');
@@ -116,8 +108,8 @@ export const EventListeners = {
     },
     
     handleStepAction(e) {
-        e.preventDefault(); // Prevent any default behaviors
-        e.stopPropagation(); // Stop event bubbling
+        e.preventDefault();
+        e.stopPropagation();
         
         const target = e.target.closest('[data-action]');
         if (!target) return;
@@ -126,7 +118,6 @@ export const EventListeners = {
         const action = target.dataset.action;
         
         if (action === 'delete') {
-            // Add exit animation before removal
             stepEl.style.transform = 'scale(0.95)';
             stepEl.style.opacity = '0';
             setTimeout(() => {
@@ -145,30 +136,24 @@ export const EventListeners = {
         const targetSibling = direction === 'move-up' ? stepEl.previousElementSibling : stepEl.nextElementSibling;
         if (!targetSibling) return;
         
-        // Store scroll position to prevent jumping
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
-        // Store form data before reordering
         const stepData = window.EventListeners.extractStepFormData(stepEl);
         const targetData = window.EventListeners.extractStepFormData(targetSibling);
         
-        // Add light visual feedback - briefly highlight the moving step
         stepEl.style.transition = 'transform 0.2s ease, background-color 0.2s ease';
         stepEl.style.transform = 'scale(1.02)';
         stepEl.style.backgroundColor = 'color-mix(in srgb, var(--bg-tertiary), var(--accent-primary) 8%)';
         
-        // DOM reordering
         if (direction === 'move-up') {
             stepEl.parentNode.insertBefore(stepEl, targetSibling);
         } else {
             stepEl.parentNode.insertBefore(targetSibling, stepEl);
         }
         
-        // Restore form data
         window.EventListeners.restoreStepFormData(stepEl, stepData);
         window.EventListeners.restoreStepFormData(targetSibling, targetData);
         
-        // Remove visual feedback after brief delay
         setTimeout(() => {
             stepEl.style.transform = '';
             stepEl.style.backgroundColor = '';
@@ -177,16 +162,13 @@ export const EventListeners = {
             }, 200);
         }, 150);
         
-        // Update button visibility
         window.EventListeners.updateStepButtonVisibility();
         
-        // Restore scroll position
         window.scrollTo({
             top: scrollTop,
             behavior: 'auto'
         });
         
-        // Announce change to screen readers
         const stepName = stepData.name || 'Unnamed step';
         const announcement = `${stepName} moved ${direction === 'move-up' ? 'up' : 'down'}`;
         window.EventListeners.announceToScreenReader(announcement);
@@ -213,7 +195,6 @@ export const EventListeners = {
     },
 
     announceToScreenReader(message) {
-        // Create a temporary element for screen reader announcements
         let announcer = document.getElementById('step-announcer');
         if (!announcer) {
             announcer = document.createElement('div');

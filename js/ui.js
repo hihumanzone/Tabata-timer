@@ -36,7 +36,6 @@ export const UI = {
     },
 
     renderWorkouts() {
-        // This will be imported when needed
         this.elements.workoutList.innerHTML = '';
         const workoutsToRender = window.WorkoutManager.getFilteredAndSorted();
         
@@ -115,7 +114,6 @@ export const UI = {
 
         this.elements.stepsList.appendChild(stepEl);
         
-        // Update button visibility after adding step
         window.EventListeners.updateStepButtonVisibility();
     },
 
