@@ -173,7 +173,7 @@ export const EventListeners = {
         }
         
         try {
-            // Store form data before animation
+            // Store form data BEFORE any DOM manipulation
             const stepData = window.EventListeners.extractStepFormData(stepEl);
             const targetData = window.EventListeners.extractStepFormData(targetSibling);
             
@@ -189,20 +189,22 @@ export const EventListeners = {
                     stepEl.parentNode.insertBefore(targetSibling, stepEl);
                 }
                 
-                // Restore form data
-                window.EventListeners.restoreStepFormData(stepEl, stepData);
-                window.EventListeners.restoreStepFormData(targetSibling, targetData);
-                
-                // Clean up classes
-                stepEl.classList.remove('moving');
-                
-                // Update button visibility after reordering
-                window.EventListeners.updateStepButtonVisibility();
-                
-                // Announce change to screen readers
-                const stepName = stepEl.querySelector('.step-name').value || 'Unnamed step';
-                const announcement = `${stepName} moved ${direction === 'move-up' ? 'up' : 'down'}`;
-                window.EventListeners.announceToScreenReader(announcement);
+                // Restore form data IMMEDIATELY after DOM manipulation
+                setTimeout(() => {
+                    window.EventListeners.restoreStepFormData(stepEl, stepData);
+                    window.EventListeners.restoreStepFormData(targetSibling, targetData);
+                    
+                    // Clean up classes
+                    stepEl.classList.remove('moving');
+                    
+                    // Update button visibility after reordering
+                    window.EventListeners.updateStepButtonVisibility();
+                    
+                    // Announce change to screen readers
+                    const stepName = stepData.name || 'Unnamed step';
+                    const announcement = `${stepName} moved ${direction === 'move-up' ? 'up' : 'down'}`;
+                    window.EventListeners.announceToScreenReader(announcement);
+                }, 10); // Very brief delay to ensure DOM is stable
                 
             }, 100); // Reduced timeout for faster response
             
