@@ -7,6 +7,7 @@ export const EventListeners = {
     init() {
         // Setup
         window.UI.elements.setupForm.addEventListener('submit', this.handleSetupSubmit);
+        window.UI.elements.setupForm.addEventListener('change', this.handleThemePreview);
         window.UI.elements.importSetupBtn.addEventListener('click', () => window.UI.elements.importUserDataInput.click());
 
         // Home Screen
@@ -129,6 +130,12 @@ export const EventListeners = {
             });
         } else {
             document.exitFullscreen();
+        }
+    },
+
+    handleThemePreview(e) {
+        if (e.target.name === 'theme') {
+            document.body.dataset.theme = e.target.value;
         }
     }
 };
