@@ -1,0 +1,47 @@
+import { ViewportManager } from './viewport-manager.js';
+import { UI } from './ui.js';
+import { State } from './state.js';
+import { Config } from './config.js';
+import { Timer } from './timer.js';
+import { WorkoutManager } from './workout-manager.js';
+import { UserDataManager } from './user-data-manager.js';
+import { EventListeners } from './event-listeners.js';
+
+/**
+ * Main application entry point.
+ * Initializes all modules and starts the application logic.
+ */
+export const App = {
+    init() {
+        // Make modules available globally for cross-module communication
+        window.UI = UI;
+        window.State = State;
+        window.Config = Config;
+        window.Timer = Timer;
+        window.WorkoutManager = WorkoutManager;
+        window.UserDataManager = UserDataManager;
+        window.EventListeners = EventListeners;
+        window.ViewportManager = ViewportManager;
+
+        ViewportManager.init();
+        UI.cacheDOMElements();
+        State.load();
+        EventListeners.init();
+
+        if (!State.settings.username) {
+            UI.show(UI.elements.setupScreen);
+        } else {
+            UI.applySettings();
+            UI.renderWorkouts();
+            UI.show(UI.elements.homeScreen);
+        }
+    }
+};
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    App.init();
+    
+    // Debug function
+    window.debugViewport = () => ViewportManager.logViewportInfo();
+});
