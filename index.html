@@ -355,6 +355,23 @@
             color: var(--text-primary);
             box-sizing: border-box;
         }
+        
+        /* Chrome-specific viewport handling */
+        .is-chrome #timerScreen {
+            /* For Chrome, prefer modern viewport units which handle zoom and UI changes better */
+            height: 100svh; /* Small viewport height - more conservative */
+            height: var(--vh-dynamic, 100svh);
+        }
+        
+        .is-chrome.is-landscape #timerScreen {
+            /* In landscape mode on Chrome, use large viewport height but with fallback */
+            height: 100lvh;
+            height: var(--vh-dynamic, 100lvh);
+            /* Add margin to account for potential UI elements */
+            margin-top: calc(env(safe-area-inset-top, 0px));
+            margin-bottom: calc(env(safe-area-inset-bottom, 0px));
+            height: calc(var(--vh-dynamic, 100lvh) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+        }
         #timerContent {
             display: flex;
             flex-direction: column;
@@ -449,21 +466,39 @@
         }
 
         @media (orientation: landscape) and (max-height: 600px) {
-            /* Better landscape support for mobile devices */
+            /* Better landscape support for mobile devices, especially Chrome tablets */
             #timerScreen {
-                height: var(--vh-large, var(--vh-dynamic, 100vh));
+                /* Prefer large viewport height for landscape, with more conservative fallbacks */
+                height: 100lvh; /* Most modern and accurate for landscape */
+                height: var(--vh-large, 100svh); /* Fallback to small viewport height */
+                height: var(--vh-large, var(--vh-dynamic, 100vh)); /* Final fallback */
                 padding: 0.5rem;
                 padding-top: calc(0.5rem + env(safe-area-inset-top, 0px));
                 padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+                /* Ensure content doesn't overflow by making it scrollable if needed */
+                overflow-y: auto;
             }
             
             #timerContent {
                 padding-top: 0.5rem;
                 padding-bottom: 0.5rem;
+                /* Ensure timer content fits within available space */
+                min-height: 0;
+                max-height: 100%;
             }
             
             #timerCountdown { 
                 font-size: clamp(3rem, 15vw, 6rem);
+            }
+        }
+
+        @media (orientation: landscape) {
+            /* Additional Chrome-specific landscape adjustments */
+            #timerScreen {
+                /* For landscape orientation, prefer viewport units that handle zoom better */
+                height: 100lvh;
+                height: var(--vh-large, 100svh);
+                height: var(--vh-large, var(--vh-dynamic, 100vh));
             }
         }
 
@@ -807,28 +842,99 @@
 
             /**
              * Manages dynamic viewport height for better cross-browser compatibility.
-             * Specifically addresses Chrome Android viewport height issues.
+             * Specifically addresses Chrome Android viewport height issues, including zoom-related problems.
              */
             const ViewportManager = {
                 init() {
+                    this.isChrome = this.detectChrome();
+                    this.applyBrowserClasses();
                     this.setDynamicViewportHeight();
                     this.setupViewportListeners();
                 },
 
+                detectChrome() {
+                    // Detect Chrome browser
+                    return /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+                },
+
+                applyBrowserClasses() {
+                    const body = document.body;
+                    
+                    // Add Chrome class
+                    if (this.isChrome) {
+                        body.classList.add('is-chrome');
+                    }
+                    
+                    // Add orientation class
+                    this.updateOrientationClass();
+                },
+
+                updateOrientationClass() {
+                    const body = document.body;
+                    const isLandscape = window.innerWidth > window.innerHeight;
+                    
+                    body.classList.toggle('is-landscape', isLandscape);
+                    body.classList.toggle('is-portrait', !isLandscape);
+                },
+
+                getZoomLevel() {
+                    // Attempt to detect zoom level
+                    return Math.round((window.devicePixelRatio || 1) * 100) / 100;
+                },
+
                 setDynamicViewportHeight() {
-                    // Calculate actual viewport height
-                    const vh = window.innerHeight * 0.01;
+                    // Prefer modern viewport units for Chrome, especially to handle zoom issues
+                    if (this.isChrome) {
+                        // For Chrome, prioritize modern viewport units which handle zoom better
+                        if (CSS.supports('height', '100svh')) {
+                            document.documentElement.style.setProperty('--vh-small', '100svh');
+                            document.documentElement.style.setProperty('--vh-dynamic', '100svh');
+                        } else if (CSS.supports('height', '100lvh')) {
+                            document.documentElement.style.setProperty('--vh-large', '100lvh');
+                            document.documentElement.style.setProperty('--vh-dynamic', '100lvh');
+                        } else {
+                            // Fallback to conservative JavaScript calculation for Chrome
+                            this.setChromeCompatibleHeight();
+                        }
+                        
+                        // Set large viewport for landscape support
+                        if (CSS.supports('height', '100lvh')) {
+                            document.documentElement.style.setProperty('--vh-large', '100lvh');
+                        }
+                    } else {
+                        // Non-Chrome browsers: use JavaScript calculation as before
+                        this.setJavaScriptHeight();
+                        
+                        // Set modern viewport units where supported
+                        if (CSS.supports('height', '100svh')) {
+                            document.documentElement.style.setProperty('--vh-small', '100svh');
+                        }
+                        if (CSS.supports('height', '100lvh')) {
+                            document.documentElement.style.setProperty('--vh-large', '100lvh');
+                        }
+                    }
                     
-                    // Set CSS custom property
+                    // Update orientation class as viewport changes
+                    this.updateOrientationClass();
+                },
+
+                setChromeCompatibleHeight() {
+                    // Use a more conservative approach for Chrome
+                    // Use document.documentElement.clientHeight which excludes scrollbars and may be more accurate
+                    const clientHeight = document.documentElement.clientHeight;
+                    const innerHeight = window.innerHeight;
+                    
+                    // Use the smaller of the two to be conservative, especially important for zoom issues
+                    const safeHeight = Math.min(clientHeight, innerHeight);
+                    const vh = safeHeight * 0.01;
+                    
                     document.documentElement.style.setProperty('--vh-dynamic', `${vh * 100}px`);
-                    
-                    // Also set fallbacks for browsers that support new viewport units
-                    if (CSS.supports('height', '100svh')) {
-                        document.documentElement.style.setProperty('--vh-small', '100svh');
-                    }
-                    if (CSS.supports('height', '100lvh')) {
-                        document.documentElement.style.setProperty('--vh-large', '100lvh');
-                    }
+                },
+
+                setJavaScriptHeight() {
+                    // Standard JavaScript-based calculation for non-Chrome browsers
+                    const vh = window.innerHeight * 0.01;
+                    document.documentElement.style.setProperty('--vh-dynamic', `${vh * 100}px`);
                 },
 
                 setupViewportListeners() {
@@ -863,6 +969,39 @@
                             this.setDynamicViewportHeight();
                         });
                     }
+
+                    // Additional Chrome-specific listener for zoom changes
+                    if (this.isChrome) {
+                        let lastZoom = this.getZoomLevel();
+                        setInterval(() => {
+                            const currentZoom = this.getZoomLevel();
+                            if (Math.abs(currentZoom - lastZoom) > 0.1) {
+                                lastZoom = currentZoom;
+                                setTimeout(() => {
+                                    this.setDynamicViewportHeight();
+                                }, 100);
+                            }
+                        }, 500); // Check for zoom changes every 500ms
+                    }
+                },
+
+                // Debugging utility to help troubleshoot viewport issues
+                logViewportInfo() {
+                    const info = {
+                        browser: this.isChrome ? 'Chrome' : 'Other',
+                        windowInnerHeight: window.innerHeight,
+                        documentClientHeight: document.documentElement.clientHeight,
+                        zoomLevel: this.getZoomLevel(),
+                        orientation: window.innerWidth > window.innerHeight ? 'landscape' : 'portrait',
+                        vhDynamic: getComputedStyle(document.documentElement).getPropertyValue('--vh-dynamic'),
+                        supports100svh: CSS.supports('height', '100svh'),
+                        supports100lvh: CSS.supports('height', '100lvh'),
+                        visualViewportHeight: window.visualViewport ? window.visualViewport.height : 'N/A',
+                        safeAreaTop: getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top, 0px)') || '0px',
+                        safeAreaBottom: getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom, 0px)') || '0px'
+                    };
+                    console.log('ViewportManager Debug Info:', info);
+                    return info;
                 }
             };
 
@@ -1620,6 +1759,9 @@
             };
             
             App.init();
+            
+            // Expose debugging utility to global scope for troubleshooting
+            window.debugViewport = () => ViewportManager.logViewportInfo();
         });
     </script>
 </body>
