@@ -197,30 +197,25 @@ export const EventListeners = {
                 }
             });
             
-            // Phase 3: Wait for animation to complete, then remove transforms before DOM manipulation
+            // Phase 3: Wait for animation to complete, then clean up and perform DOM manipulation
             setTimeout(() => {
-                // First, remove slide transforms to return elements to normal positions
-                stepEl.classList.remove('slide-up', 'slide-down');
-                targetSibling.classList.remove('slide-up', 'slide-down');
+                // Remove all animation classes at once to return elements to normal state
+                stepEl.classList.remove('moving', 'animating', 'slide-up', 'slide-down');
+                targetSibling.classList.remove('animating', 'target-sliding', 'slide-up', 'slide-down');
                 
-                // Wait for transform removal to complete
-                setTimeout(() => {
-                    // Now perform DOM reordering (elements are visually in original positions)
-                    if (direction === 'move-up') {
-                        stepEl.parentNode.insertBefore(stepEl, targetSibling);
-                    } else {
-                        stepEl.parentNode.insertBefore(targetSibling, stepEl);
-                    }
-                    
-                    // Restore form data immediately after DOM manipulation
-                    window.EventListeners.restoreStepFormData(stepEl, stepData);
-                    window.EventListeners.restoreStepFormData(targetSibling, targetData);
-                    
-                    // Final cleanup
-                    setTimeout(() => {
-                        // Clean up all animation classes
-                        stepEl.classList.remove('moving', 'animating');
-                        targetSibling.classList.remove('animating', 'target-sliding');
+                // Use requestAnimationFrame to ensure DOM has fully settled after class removal
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        // Now perform DOM reordering when elements are in normal visual state
+                        if (direction === 'move-up') {
+                            stepEl.parentNode.insertBefore(stepEl, targetSibling);
+                        } else {
+                            stepEl.parentNode.insertBefore(targetSibling, stepEl);
+                        }
+                        
+                        // Restore form data immediately after DOM manipulation
+                        window.EventListeners.restoreStepFormData(stepEl, stepData);
+                        window.EventListeners.restoreStepFormData(targetSibling, targetData);
                         
                         // Update button visibility after reordering
                         window.EventListeners.updateStepButtonVisibility();
@@ -235,9 +230,8 @@ export const EventListeners = {
                         const stepName = stepData.name || 'Unnamed step';
                         const announcement = `${stepName} moved ${direction === 'move-up' ? 'up' : 'down'}`;
                         window.EventListeners.announceToScreenReader(announcement);
-                    }, 50);
-                    
-                }, 100); // Brief delay for transform removal
+                    });
+                });
                 
             }, 600); // Wait for full animation duration
             
