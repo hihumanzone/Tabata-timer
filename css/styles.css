@@ -783,14 +783,13 @@ input:focus, select:focus, textarea:focus {
 }
 
 .custom-dropdown-option[aria-selected="true"] {
-    background-color: color-mix(in srgb, var(--accent-primary), transparent 90%);
     color: var(--accent-primary);
     font-weight: 500;
 }
 
 .custom-dropdown-option[aria-selected="true"]:hover,
 .custom-dropdown-option[aria-selected="true"].focused {
-    background-color: color-mix(in srgb, var(--accent-primary), transparent 80%);
+    background-color: var(--bg-tertiary);
 }
 
 /* Mobile responsiveness for notifications */

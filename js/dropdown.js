@@ -278,6 +278,29 @@ export const Dropdown = {
     },
 
     /**
+     * Update dropdown to match select element value
+     */
+    updateFromSelect(dropdown, selectElement) {
+        const trigger = dropdown.querySelector('.custom-dropdown-trigger');
+        const text = dropdown.querySelector('.custom-dropdown-text');
+        const options = dropdown.querySelectorAll('.custom-dropdown-option');
+        
+        const currentValue = selectElement.value;
+        
+        // Update visual selection
+        options.forEach(option => {
+            const isSelected = option.dataset.value === currentValue;
+            option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        });
+        
+        // Update trigger text
+        const selectedOption = Array.from(options).find(opt => opt.dataset.value === currentValue);
+        if (selectedOption) {
+            text.textContent = selectedOption.textContent;
+        }
+    },
+
+    /**
      * Replace all select elements on page with custom dropdowns
      */
     replaceAll() {
