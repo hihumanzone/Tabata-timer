@@ -335,8 +335,9 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%;
-            height: 100vh; /* Fallback */
-            height: 100dvh;
+            height: 100vh; /* Fallback for older browsers */
+            height: calc(100vh - env(keyboard-inset-height, 0px)); /* Account for virtual keyboard */
+            height: 100dvh; /* Modern browsers with dynamic viewport */
             background-color: var(--bg-primary);
             z-index: 1100;
             display: flex;
@@ -344,6 +345,11 @@
             text-align: center;
             padding: 1rem;
             color: var(--text-primary);
+            /* Ensure content fits within viewport on problematic browsers */
+            max-height: 100vh;
+            max-height: calc(100vh - env(keyboard-inset-height, 0px));
+            max-height: 100dvh;
+            box-sizing: border-box;
         }
         #timerContent {
             display: flex;
@@ -356,6 +362,9 @@
             overflow-y: auto;
             padding-top: 1rem;
             padding-bottom: 1rem;
+            /* Ensure content area respects container bounds */
+            max-height: calc(100vh - 120px); /* Account for progress info and padding */
+            max-height: calc(100dvh - 120px);
         }
         .timer-progress-info {
             width: 100%;
@@ -423,6 +432,27 @@
         @media (max-width: 768px) {
             .home-header { flex-direction: column; align-items: flex-start; }
             .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        /* Chrome-specific fixes for viewport height issues on tablets */
+        @supports (-webkit-touch-callout: none) {
+            #timerScreen {
+                /* Use more conservative height calculation for WebKit browsers */
+                height: calc(100vh - 1px);
+                max-height: calc(100vh - 1px);
+            }
+        }
+
+        /* Android Chrome specific adjustments */
+        @media screen and (max-width: 1024px) and (orientation: landscape) {
+            #timerScreen {
+                /* More conservative height for landscape tablets */
+                height: calc(100vh - 2px);
+                max-height: calc(100vh - 2px);
+            }
+            #timerContent {
+                max-height: calc(100vh - 140px);
+            }
         }
 
         @media (orientation: landscape) {
