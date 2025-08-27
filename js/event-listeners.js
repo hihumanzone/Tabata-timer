@@ -197,54 +197,49 @@ export const EventListeners = {
                 }
             });
             
-            // Phase 3: Wait for the slide animation to complete, then perform DOM reordering
+            // Phase 3: Wait for animation to complete, then remove transforms before DOM manipulation
             setTimeout(() => {
-                // Perform the actual DOM reordering
-                if (direction === 'move-up') {
-                    stepEl.parentNode.insertBefore(stepEl, targetSibling);
-                } else {
-                    stepEl.parentNode.insertBefore(targetSibling, stepEl);
-                }
+                // First, remove slide transforms to return elements to normal positions
+                stepEl.classList.remove('slide-up', 'slide-down');
+                targetSibling.classList.remove('slide-up', 'slide-down');
                 
-                // Phase 4: Allow DOM to fully settle before removing transforms
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        // Now safely remove slide transforms after DOM has settled
-                        stepEl.classList.remove('slide-up', 'slide-down');
-                        targetSibling.classList.remove('slide-up', 'slide-down');
+                // Wait for transform removal to complete
+                setTimeout(() => {
+                    // Now perform DOM reordering (elements are visually in original positions)
+                    if (direction === 'move-up') {
+                        stepEl.parentNode.insertBefore(stepEl, targetSibling);
+                    } else {
+                        stepEl.parentNode.insertBefore(targetSibling, stepEl);
+                    }
+                    
+                    // Restore form data immediately after DOM manipulation
+                    window.EventListeners.restoreStepFormData(stepEl, stepData);
+                    window.EventListeners.restoreStepFormData(targetSibling, targetData);
+                    
+                    // Final cleanup
+                    setTimeout(() => {
+                        // Clean up all animation classes
+                        stepEl.classList.remove('moving', 'animating');
+                        targetSibling.classList.remove('animating', 'target-sliding');
                         
-                        // Phase 5: Restore form data and finalize
-                        setTimeout(() => {
-                            // Restore form data
-                            window.EventListeners.restoreStepFormData(stepEl, stepData);
-                            window.EventListeners.restoreStepFormData(targetSibling, targetData);
-                            
-                            // Phase 6: Final cleanup and state updates
-                            setTimeout(() => {
-                                // Clean up all animation classes
-                                stepEl.classList.remove('moving', 'animating');
-                                targetSibling.classList.remove('animating', 'target-sliding');
-                                
-                                // Update button visibility after reordering
-                                window.EventListeners.updateStepButtonVisibility();
-                                
-                                // Restore scroll position to prevent jumping
-                                window.scrollTo({
-                                    top: scrollTop,
-                                    behavior: 'auto' // Use auto to prevent additional animation conflicts
-                                });
-                                
-                                // Announce change to screen readers
-                                const stepName = stepData.name || 'Unnamed step';
-                                const announcement = `${stepName} moved ${direction === 'move-up' ? 'up' : 'down'}`;
-                                window.EventListeners.announceToScreenReader(announcement);
-                            }, 50); // Reduced timing for faster cleanup
-                            
-                        }, 50); // Brief delay for DOM settling
-                    });
-                });
+                        // Update button visibility after reordering
+                        window.EventListeners.updateStepButtonVisibility();
+                        
+                        // Restore scroll position to prevent jumping
+                        window.scrollTo({
+                            top: scrollTop,
+                            behavior: 'auto'
+                        });
+                        
+                        // Announce change to screen readers
+                        const stepName = stepData.name || 'Unnamed step';
+                        const announcement = `${stepName} moved ${direction === 'move-up' ? 'up' : 'down'}`;
+                        window.EventListeners.announceToScreenReader(announcement);
+                    }, 50);
+                    
+                }, 100); // Brief delay for transform removal
                 
-            }, 600); // Match the CSS transition duration (600ms)
+            }, 600); // Wait for full animation duration
             
         } catch (error) {
             console.error('Error in animateStepReorder:', error);
