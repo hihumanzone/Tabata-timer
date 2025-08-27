@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customizable Tabata Timer</title>
+    <style>
+        /* --- General & Variables --- */
+        :root {
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            
+            /* Light Theme (Default) */
+            --bg-primary: #f4f7f9;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e9eef2;
+            --text-primary: #1c1c1e;
+            --text-secondary: #6b7280;
+            --accent-primary: #007aff;
+            --accent-secondary: #e5e5ea;
+            --border-color: #d1d5db;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --danger-color: #ff3b30;
+
+            --color-red: #ff3b30;
+            --color-orange: #ff9500;
+            --color-yellow: #ffcc00;
+            --color-green: #34c759;
+            --color-blue: #007aff;
+            --color-indigo: #5856d6;
+            --color-purple: #af52de;
+        }
+
+        body[data-theme="dark"] {
+            --bg-primary: #1c1c1e;
+            --bg-secondary: #2c2c2e;
+            --bg-tertiary: #3a3a3c;
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --accent-primary: #0a84ff;
+            --accent-secondary: #3a3a3c;
+            --border-color: #444446;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --danger-color: #ff453a;
+        }
+        
+        body[data-theme="high-contrast"] {
+            --bg-primary: #000000;
+            --bg-secondary: #121212;
+            --bg-tertiary: #1d1d1d;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-primary: #0a84ff;
+            --accent-secondary: #2c2c2e;
+            --border-color: #333333;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --danger-color: #ff453a;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+            line-height: 1.6;
+        }
+        
+        .hidden { display: none !important; }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* --- Buttons & Inputs --- */
+        button, .button {
+            font-family: inherit;
+            font-size: 1rem;
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: var(--accent-primary);
+            color: white;
+            transition: background-color 0.2s, transform 0.1s, opacity 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        button:hover { background-color: color-mix(in srgb, var(--accent-primary), #000 10%); }
+        button:active { transform: scale(0.98); }
+        button:disabled {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        button.primary {
+            font-size: 1.2rem;
+            padding: 1rem 2rem;
+        }
+        button.secondary { background-color: var(--bg-tertiary); color: var(--text-primary); }
+        button.secondary:hover:not(:disabled) { background-color: var(--border-color); }
+        button.danger { background-color: var(--danger-color); }
+        button.danger:hover { background-color: color-mix(in srgb, var(--danger-color), #000 10%); }
+        
+        input, select, textarea {
+            font-family: inherit;
+            font-size: 1rem;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            width: 100%;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+        
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+
+        /* --- Modals --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-header h2 { margin: 0; }
+        .modal-close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); }
+
+        /* --- Setup Screen --- */
+        #setupScreen .modal-content { max-width: 400px; }
+        #setupScreen .theme-options { display: flex; justify-content: space-around; gap: 1rem; margin-top: 1rem; }
+        #setupScreen .theme-option { text-align: center; cursor: pointer; }
+        #setupScreen .theme-preview { width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--border-color); margin: 0 auto 0.5rem; transition: border-color 0.2s; }
+        #setupScreen input[type="radio"] { display: none; }
+        #setupScreen input[type="radio"]:checked + .theme-preview { border-color: var(--accent-primary); }
+        .theme-light { background: linear-gradient(45deg, #f4f7f9 50%, #fff 50%); }
+        .theme-dark { background: linear-gradient(45deg, #1c1c1e 50%, #2c2c2e 50%); }
+        .theme-high-contrast { background: linear-gradient(45deg, #000 50%, #121212 50%); }
+
+        /* --- Home Screen --- */
+        .home-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .home-header h1 { font-size: 2rem; }
+        .header-controls { display: flex; gap: 1rem; align-items: center; }
+
+        .search-sort-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .search-sort-container > * { flex: 1 1 200px; }
+
+        /* Workout Cards */
+        .workout-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .workout-card {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-left: 5px solid var(--color-tag, var(--accent-primary));
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        .workout-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px var(--shadow-color); }
+        
+        .card-main-content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .card-title { font-size: 1.25rem; font-weight: 600; margin-right: 0.5rem; }
+        .card-favorite-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); }
+        .card-favorite-btn.favorited { color: var(--color-yellow); }
+
+        .card-content { flex-grow: 1; }
+        .card-description { color: var(--text-secondary); margin-bottom: 1.5rem; }
+        .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+
+        .card-settings-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); }
+        .settings-menu-wrapper { position: relative; }
+        .settings-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            bottom: 100%;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            z-index: 10;
+            width: 150px;
+        }
+        .card-settings-btn:focus + .settings-menu, .settings-menu:hover { display: block; }
+        .settings-menu button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: none;
+            color: var(--text-primary);
+            text-align: left;
+            border-radius: 0;
+        }
+        .settings-menu button:hover { background-color: var(--bg-tertiary); }
+        .settings-menu button.danger { color: var(--danger-color); }
+        
+        .workout-list.list-view {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .list-view .workout-card {
+            flex-direction: row;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .list-view .card-main-content {
+             flex-grow: 1;
+        }
+        .list-view .card-header {
+            margin-bottom: 0.25rem;
+        }
+        .list-view .card-description {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .list-view .card-actions {
+            flex-shrink: 0;
+            margin-top: 0;
+        }
+
+        /* --- Workout Editor --- */
+        #editorScreen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: var(--bg-primary);
+            z-index: 500;
+            overflow-y: auto;
+        }
+        .editor-container { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; }
+        .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .editor-section {
+            background-color: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        .editor-section h3 { margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        
+        .color-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .color-tag {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .color-tag:hover { transform: scale(1.1); }
+        .color-tag.selected { border-color: var(--text-primary); }
+
+        .step-item {
+            background-color: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+        .step-item[data-type="work"] { border-color: var(--color-orange); }
+        .step-item[data-type="rest"] { border-color: var(--color-green); }
+        .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .step-header h4 { text-transform: capitalize; }
+        .step-controls button { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary); padding: 0.25rem; }
+
+        /* --- Timer Screen --- */
+        #timerScreen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100vh; /* Fallback */
+            height: 100dvh;
+            background-color: var(--bg-primary);
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            padding: 1rem;
+            color: var(--text-primary);
+        }
+        #timerContent {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            flex-grow: 1;
+            width: 100%;
+            min-height: 0;
+            overflow-y: auto;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .timer-progress-info {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 1rem;
+            flex-shrink: 0;
+        }
+        
+        #timerCurrentCategory { font-size: clamp(1.25rem, 5vw, 2rem); font-weight: 300; text-transform: uppercase; letter-spacing: 2px; color: var(--text-secondary); }
+        #timerCurrentName { font-size: clamp(2rem, 8vw, 4.5rem); font-weight: 700; margin: 0.5rem 0; line-height: 1.1; }
+        #timerMediaContainer {
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 16 / 9;
+            background-color: var(--bg-tertiary);
+            border-radius: 12px;
+            margin: 1rem 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0; 
+        }
+        #timerMediaContainer img, #timerMediaContainer video { width: 100%; height: 100%; object-fit: cover; }
+        
+        .timer-info-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        #timerCountdown { font-size: clamp(4.5rem, 22vw, 9rem); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+        #timerReps { font-size: clamp(1.5rem, 5vw, 2rem); color: var(--text-secondary); }
+        #timerDescription { max-width: 500px; font-size: clamp(0.9rem, 3vw, 1.1rem); }
+        
+        #timerStepProgress { color: var(--text-secondary); margin-bottom: 0.5rem; }
+        #timerOverallProgress {
+            width: 100%;
+            height: 10px;
+            background-color: var(--bg-tertiary);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        #timerOverallProgressBar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--accent-primary);
+            transition: width 0.3s ease-in-out;
+        }
+        
+        .timer-controls { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+        
+        /* Responsive */
+        .timer-details-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .home-header { flex-direction: column; align-items: flex-start; }
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        @media (orientation: landscape) {
+            #timerScreen.media-visible #timerContent {
+                flex-direction: row;
+                gap: 2rem;
+                align-items: center;
+            }
+            #timerScreen.media-visible #timerMediaContainer {
+                flex: 1 1 50%;
+                margin: 0;
+                height: 100%;
+                max-height: 80vh;
+            }
+            #timerScreen.media-visible .timer-details-wrapper {
+                flex: 1 1 50%;
+                height: 100%;
+                overflow-y: auto;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <!-- =========== FIRST TIME SETUP SCREEN =========== -->
+    <div id="setupScreen" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Welcome!</h2>
+            <p>Let's get you set up. Please enter your name and choose a theme.</p>
+            <form id="setupForm" style="margin-bottom: 1rem;">
+                <div class="form-group">
+                    <label for="setupUsername">Username</label>
+                    <input type="text" id="setupUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Theme</label>
+                    <div class="theme-options">
+                        <label class="theme-option">
+                            <input type="radio" name="theme" value="light" checked>
+                            <div class="theme-preview theme-light"></div>
+                            <span>Light</span>
+                        </label>
+                        <label class="theme-option">
+                            <input type="radio" name="theme" value="dark">
+                            <div class="theme-preview theme-dark"></div>
+                            <span>Dark</span>
+                        </label>
+                        <label class="theme-option">
+                            <input type="radio" name="theme" value="high-contrast">
+                            <div class="theme-preview theme-high-contrast"></div>
+                            <span>AMOLED</span>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit">Get Started</button>
+            </form>
+            <button id="importSetupBtn" class="secondary" style="width: 100%;">Import Existing Data</button>
+        </div>
+    </div>
+
+    <!-- =========== HOME SCREEN =========== -->
+    <div id="homeScreen" class="app-container" role="main">
+        <header class="home-header">
+            <h1 id="welcomeMessage">Workouts</h1>
+            <div class="header-controls">
+                <button id="newWorkoutBtn">New Workout</button>
+                <button class="secondary" id="importWorkoutBtn">Import Workout</button>
+                <input type="file" id="importWorkoutFileInput" class="hidden" accept=".json">
+                <button class="secondary" id="mainSettingsBtn" aria-label="Main Settings">⚙️</button>
+            </div>
+        </header>
+
+        <section aria-labelledby="controls-heading">
+            <h2 id="controls-heading" class="hidden">Workout Controls</h2>
+            <div class="search-sort-container">
+                <input type="search" id="searchBar" placeholder="Search workouts..." aria-label="Search workouts">
+                <select id="sortSelect" aria-label="Sort workouts by">
+                    <option value="name-asc">Sort by Name (A-Z)</option>
+                    <option value="name-desc">Sort by Name (Z-A)</option>
+                    <option value="date-new">Newest First</option>
+                    <option value="date-old">Oldest First</option>
+                    <option value="color">Sort by Color</option>
+                </select>
+            </div>
+            <div id="workoutList" class="workout-list">
+                <!-- Workout cards will be injected here -->
+            </div>
+            <p id="noWorkoutsMessage" class="hidden">No workouts found. Create one to get started!</p>
+        </section>
+    </div>
+
+    <!-- =========== WORKOUT EDITOR SCREEN =========== -->
+    <div id="editorScreen" class="hidden" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+        <div class="editor-container">
+            <header class="editor-header">
+                <h2 id="editorTitle">Create Workout</h2>
+                <div>
+                    <button id="saveWorkoutBtn">Save</button>
+                    <button id="cancelEditorBtn" class="secondary">Cancel</button>
+                </div>
+            </header>
+            <form id="workoutForm">
+                <input type="hidden" id="workoutId">
+                
+                <section class="editor-section" aria-labelledby="general-heading">
+                    <h3 id="general-heading">General</h3>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="workoutTitle">Title</label>
+                            <input type="text" id="workoutTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="workoutColor">Color Tag</label>
+                            <div id="colorSelector" class="color-selector" role="radiogroup"></div>
+                            <input type="hidden" id="workoutColor">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="workoutDescription">Description (Optional)</label>
+                        <textarea id="workoutDescription" rows="3"></textarea>
+                    </div>
+                </section>
+
+                <section class="editor-section" aria-labelledby="timing-heading">
+                    <h3 id="timing-heading">Timing</h3>
+                     <div class="grid-2">
+                        <div class="form-group">
+                            <label for="workoutPrepare">Prepare (seconds)</label>
+                            <input type="number" id="workoutPrepare" min="0" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="prepareMedia">Prepare Media URL (Optional)</label>
+                            <input type="text" id="prepareMedia" placeholder="Image or video URL">
+                        </div>
+                        <div class="form-group">
+                            <label for="workoutSets">Sets</label>
+                            <input type="number" id="workoutSets" min="1" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="workoutCooldown">Cooldown (seconds)</label>
+                            <input type="number" id="workoutCooldown" min="0" value="30">
+                        </div>
+                        <div class="form-group">
+                            <label for="cooldownMedia">Cooldown Media URL (Optional)</label>
+                            <input type="text" id="cooldownMedia" placeholder="Image or video URL">
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="editor-section" aria-labelledby="steps-heading">
+                    <h3 id="steps-heading">Steps</h3>
+                    <div id="stepsList">
+                        <!-- Step items will be injected here -->
+                    </div>
+                    <div>
+                        <button type="button" class="secondary" id="addWorkStepBtn">Add Work</button>
+                        <button type="button" class="secondary" id="addRestStepBtn">Add Rest</button>
+                    </div>
+                </section>
+            </form>
+        </div>
+    </div>
+    
+    <!-- =========== TIMER SCREEN =========== -->
+    <div id="timerScreen" class="hidden" role="alert" aria-live="assertive">
+        <div id="timerContent">
+            <div id="timerMediaContainer"></div>
+            <div class="timer-details-wrapper">
+                <h2 id="timerCurrentCategory">PREPARE</h2>
+                <h1 id="timerCurrentName">Workout Title</h1>
+                <div class="timer-info-area">
+                    <div id="timerCountdown">00:10</div>
+                    <div id="timerReps" class="hidden"></div>
+                    <p id="timerDescription"></p>
+                    <button id="timerDoneBtn" class="primary hidden">Done</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="timer-progress-info">
+            <p id="timerStepProgress">Set 1 of 3 &bull; Up Next: Push Ups</p>
+            <div id="timerOverallProgress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div id="timerOverallProgressBar"></div>
+            </div>
+            <div class="timer-controls">
+                <button id="timerPrevBtn" class="secondary">Previous</button>
+                <button id="timerPauseResumeBtn">Pause</button>
+                <button id="timerSkipBtn" class="secondary">Skip</button>
+                <button id="timerFullscreenBtn" class="secondary">Fullscreen ↗️</button>
+                <button id="timerQuitBtn" class="danger">Quit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========== MODALS (Settings, Preview) =========== -->
+    <div id="mainSettingsModal" class="modal-overlay hidden">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+            <div class="modal-header">
+                <h2 id="settings-title">Settings</h2>
+                <button class="modal-close-btn" aria-label="Close Settings">&times;</button>
+            </div>
+            <form id="mainSettingsForm">
+                <div class="form-group">
+                    <label for="settingsUsername">Username</label>
+                    <input type="text" id="settingsUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="settingsTheme">Theme</label>
+                    <select id="settingsTheme">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="high-contrast">AMOLED</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="settingsView">Workout Display</label>
+                    <select id="settingsView">
+                        <option value="grid">Grid View</option>
+                        <option value="list">List View</option>
+                    </select>
+                </div>
+                <button type="submit">Save Settings</button>
+            </form>
+            <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; display: flex; gap: 1rem;">
+                <button id="exportUserDataBtn" class="secondary" style="flex: 1;">Export User Data</button>
+                <button id="importUserDataBtn" class="secondary" style="flex: 1;">Import User Data</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="previewModal" class="modal-overlay hidden">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
+            <div class="modal-header">
+                <h2 id="previewTitle">Workout Preview</h2>
+                <button class="modal-close-btn" aria-label="Close Preview">&times;</button>
+            </div>
+            <div id="previewContent"></div>
+        </div>
+    </div>
+    
+    <!-- Hidden file input for all imports -->
+    <input type="file" id="importUserDataInput" class="hidden" accept=".json">
+
+
+    <!-- =========== HTML TEMPLATES =========== -->
+    <template id="workoutCardTemplate">
+        <div class="workout-card" data-id="">
+            <div class="card-main-content">
+                <div class="card-header">
+                    <h3 class="card-title"></h3>
+                    <button class="card-favorite-btn" data-action="favorite" aria-label="Toggle Favorite">☆</button>
+                </div>
+                <div class="card-content">
+                    <p class="card-description"></p>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button class="card-start-btn" data-action="start">Start</button>
+                <div class="settings-menu-wrapper">
+                    <button class="card-settings-btn" data-action="toggle-menu" tabindex="0" aria-label="Workout Settings">⚙️</button>
+                    <div class="settings-menu">
+                        <button data-action="preview">Preview</button>
+                        <button data-action="edit">Edit</button>
+                        <button data-action="duplicate">Duplicate</button>
+                        <button data-action="exportWorkout">Export Workout</button>
+                        <button data-action="delete" class="danger">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="editorStepTemplate">
+        <div class="step-item" data-id="" data-type="">
+            <div class="step-header">
+                <h4></h4>
+                <div class="step-controls">
+                    <button data-action="move-up" aria-label="Move step up">▲</button>
+                    <button data-action="move-down" aria-label="Move step down">▼</button>
+                    <button data-action="delete" class="danger" aria-label="Delete step">&times;</button>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" class="step-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Description (Optional)</label>
+                    <input type="text" class="step-description">
+                </div>
+                <div class="form-group">
+                    <label>Duration (seconds, 0 for manual)</label>
+                    <input type="number" class="step-duration" min="0" value="30">
+                </div>
+                <div class="form-group">
+                    <label>Reps (Optional)</label>
+                    <input type="number" class="step-reps" min="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Media URL (Image/Video, Optional)</label>
+                <input type="text" class="step-media" placeholder="https://example.com/image.jpg">
+            </div>
+        </div>
+    </template>
+    
+    <script>
+        /**
+         * Main application entry point.
+         * Initializes all modules and starts the application logic.
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            const App = {
+                init() {
+                    UI.cacheDOMElements();
+                    State.load();
+                    EventListeners.init();
+
+                    if (!State.settings.username) {
+                        UI.show(UI.elements.setupScreen);
+                    } else {
+                        UI.applySettings();
+                        UI.renderWorkouts();
+                        UI.show(UI.elements.homeScreen);
+                    }
+                }
+            };
+
+            /**
+             * Handles static configuration data.
+             */
+            const Config = {
+                colors: {
+                    'red': '#ff3b30', 'orange': '#ff9500', 'yellow': '#ffcc00', 
+                    'green': '#34c759', 'blue': '#007aff', 'indigo': '#5856d6', 'purple': '#af52de'
+                }
+            };
+
+            /**
+             * Manages the application's state and data persistence in localStorage.
+             */
+            const State = {
+                settings: {
+                    username: '',
+                    theme: 'light',
+                    view: 'grid'
+                },
+                workouts: [],
+                timer: {
+                    interval: null,
+                    wakeLock: null,
+                    state: 'stopped', // stopped, running, paused
+                    currentWorkout: null,
+                    executionQueue: [],
+                    currentIndex: -1,
+                    timeLeft: 0,
+                },
+
+                save() {
+                    localStorage.setItem('tabataSettings', JSON.stringify(this.settings));
+                    localStorage.setItem('tabataWorkouts', JSON.stringify(this.workouts));
+                },
+
+                load() {
+                    const settings = localStorage.getItem('tabataSettings');
+                    const workouts = localStorage.getItem('tabataWorkouts');
+                    if (settings) this.settings = JSON.parse(settings);
+                    if (workouts) this.workouts = JSON.parse(workouts);
+                }
+            };
+
+            /**
+             * Handles all DOM manipulations, rendering, and UI state changes.
+             */
+            const UI = {
+                elements: {},
+
+                cacheDOMElements() {
+                    const ids = [
+                        'setupScreen', 'homeScreen', 'editorScreen', 'timerScreen', 'workoutList', 'welcomeMessage',
+                        'setupForm', 'setupUsername', 'importSetupBtn', 'newWorkoutBtn', 'importWorkoutBtn', 'importWorkoutFileInput',
+                        'importUserDataInput', 'mainSettingsBtn', 'searchBar', 'sortSelect', 'noWorkoutsMessage',
+                        'editorTitle', 'workoutForm', 'workoutId', 'workoutTitle', 'workoutDescription',
+                        'workoutPrepare', 'prepareMedia', 'workoutSets', 'workoutCooldown', 'cooldownMedia',
+                        'workoutColor', 'colorSelector', 'stepsList', 'saveWorkoutBtn', 'cancelEditorBtn',
+                        'addWorkStepBtn', 'addRestStepBtn', 'timerCurrentCategory', 'timerCurrentName',
+                        'timerMediaContainer', 'timerCountdown', 'timerReps', 'timerDescription', 'timerDoneBtn',
+                        'timerStepProgress', 'timerOverallProgress', 'timerOverallProgressBar', 'timerPauseResumeBtn',
+                        'timerQuitBtn', 'timerPrevBtn', 'timerSkipBtn', 'timerFullscreenBtn',
+                        'mainSettingsModal', 'mainSettingsForm', 'settingsUsername', 'settingsTheme',
+                        'settingsView', 'exportUserDataBtn', 'importUserDataBtn', 'previewModal',
+                        'previewTitle', 'previewContent'
+                    ];
+                    ids.forEach(id => this.elements[id] = document.getElementById(id));
+                },
+
+                show: el => el.classList.remove('hidden'),
+                hide: el => el.classList.add('hidden'),
+
+                applySettings() {
+                    document.body.dataset.theme = State.settings.theme;
+                    this.elements.welcomeMessage.textContent = `Welcome, ${State.settings.username}!`;
+                    this.elements.workoutList.className = `workout-list ${State.settings.view === 'list' ? 'list-view' : ''}`;
+                },
+
+                renderWorkouts() {
+                    this.elements.workoutList.innerHTML = '';
+                    const workoutsToRender = WorkoutManager.getFilteredAndSorted();
+                    
+                    this.elements.noWorkoutsMessage.classList.toggle('hidden', workoutsToRender.length > 0);
+                    
+                    workoutsToRender.forEach(workout => {
+                        const card = this.createWorkoutCard(workout);
+                        this.elements.workoutList.appendChild(card);
+                    });
+                },
+
+                createWorkoutCard(workout) {
+                    const template = document.getElementById('workoutCardTemplate');
+                    const card = template.content.cloneNode(true).firstElementChild;
+                    card.dataset.id = workout.id;
+                    card.style.setProperty('--color-tag', Config.colors[workout.color] || 'var(--accent-primary)');
+                    card.querySelector('.card-title').textContent = workout.title;
+                    card.querySelector('.card-description').textContent = workout.description || '';
+                    const favBtn = card.querySelector('.card-favorite-btn');
+                    favBtn.textContent = workout.isFavorite ? '★' : '☆';
+                    favBtn.classList.toggle('favorited', workout.isFavorite);
+                    return card;
+                },
+                
+                openEditor(workout = null) {
+                    this.elements.workoutForm.reset();
+                    this.elements.stepsList.innerHTML = '';
+                    this.buildColorSelector();
+
+                    if (workout) {
+                        this.elements.editorTitle.textContent = 'Edit Workout';
+                        this.elements.workoutId.value = workout.id;
+                        this.elements.workoutTitle.value = workout.title;
+                        this.elements.workoutDescription.value = workout.description;
+                        this.elements.workoutPrepare.value = workout.prepare;
+                        this.elements.prepareMedia.value = workout.prepareMedia || '';
+                        this.elements.workoutSets.value = workout.sets;
+                        this.elements.workoutCooldown.value = workout.cooldown;
+                        this.elements.cooldownMedia.value = workout.cooldownMedia || '';
+                        this.elements.workoutColor.value = workout.color;
+                        
+                        document.querySelectorAll('.color-tag').forEach(tag => {
+                            tag.classList.toggle('selected', tag.dataset.color === workout.color);
+                        });
+                        
+                        workout.steps.forEach(step => this.addStepToEditor(step.type, step));
+                    } else {
+                        this.elements.editorTitle.textContent = 'Create Workout';
+                        this.elements.workoutId.value = '';
+                        document.querySelector('.color-tag[data-color="blue"]').classList.add('selected');
+                        this.elements.workoutColor.value = 'blue';
+                    }
+
+                    this.hide(this.elements.homeScreen);
+                    this.show(this.elements.editorScreen);
+                },
+
+                closeEditor() {
+                    this.hide(this.elements.editorScreen);
+                    this.show(this.elements.homeScreen);
+                },
+
+                addStepToEditor(type, data = {}) {
+                    const template = document.getElementById('editorStepTemplate');
+                    const stepEl = template.content.cloneNode(true).firstElementChild;
+                    
+                    stepEl.dataset.type = type;
+                    stepEl.dataset.id = data.id || `s-${Date.now()}`;
+                    stepEl.querySelector('h4').textContent = `${type} Step`;
+                    
+                    stepEl.querySelector('.step-name').value = data.name || '';
+                    stepEl.querySelector('.step-description').value = data.description || '';
+                    stepEl.querySelector('.step-duration').value = data.duration !== undefined ? data.duration : (type === 'work' ? 30 : 15);
+                    stepEl.querySelector('.step-reps').value = data.reps || '';
+                    stepEl.querySelector('.step-media').value = data.media || '';
+
+                    this.elements.stepsList.appendChild(stepEl);
+                },
+
+                buildColorSelector() {
+                    this.elements.colorSelector.innerHTML = '';
+                    Object.entries(Config.colors).forEach(([name, hex]) => {
+                        const tag = document.createElement('div');
+                        tag.className = 'color-tag';
+                        tag.dataset.color = name;
+                        tag.style.backgroundColor = hex;
+                        tag.setAttribute('role', 'radio');
+                        tag.setAttribute('aria-checked', 'false');
+                        tag.addEventListener('click', () => {
+                            const selected = document.querySelector('.color-tag.selected');
+                            if (selected) {
+                                selected.classList.remove('selected');
+                                selected.setAttribute('aria-checked', 'false');
+                            }
+                            tag.classList.add('selected');
+                            tag.setAttribute('aria-checked', 'true');
+                            this.elements.workoutColor.value = name;
+                        });
+                        this.elements.colorSelector.appendChild(tag);
+                    });
+                },
+
+                updateTimerUI(data) {
+                    this.elements.timerScreen.classList.toggle('media-visible', !!data.media?.trim());
+                    this.elements.timerCurrentCategory.textContent = data.category;
+                    this.elements.timerCurrentName.textContent = data.name;
+                    this.elements.timerDescription.textContent = data.description || '';
+                    
+                    this.elements.timerReps.classList.toggle('hidden', !data.reps > 0);
+                    if (data.reps > 0) this.elements.timerReps.textContent = `${data.reps} Reps`;
+
+                    const mediaContainer = this.elements.timerMediaContainer;
+                    if (data.media?.trim()) {
+                        this.show(mediaContainer);
+                        mediaContainer.innerHTML = '';
+                        if (/\.(jpg|jpeg|png|gif|webp)$/i.test(data.media)) {
+                            mediaContainer.innerHTML = `<img src="${data.media}" alt="${data.name}">`;
+                        } else if (/\.(mp4|webm|ogv)$/i.test(data.media)) {
+                            mediaContainer.innerHTML = `<video src="${data.media}" autoplay muted loop playsinline></video>`;
+                        }
+                    } else {
+                        this.hide(mediaContainer);
+                    }
+                    
+                    const timerEl = this.elements.timerCountdown;
+                    if (data.duration > 0) {
+                        this.show(timerEl);
+                        timerEl.textContent = Timer.formatTime(State.timer.timeLeft);
+                    } else {
+                        this.hide(timerEl);
+                    }
+                    
+                    let progressText = '';
+                    if (data.set) {
+                        progressText += `Set ${data.set} of ${State.timer.currentWorkout.sets}`;
+                    }
+                    const nextEvent = State.timer.executionQueue[State.timer.currentIndex + 1];
+                    if (nextEvent) {
+                        let nextName = nextEvent.type === 'step' ? State.timer.currentWorkout.steps[nextEvent.stepIndex].name : nextEvent.type;
+                        progressText += ` • Up Next: ${nextName}`;
+                    } else {
+                        progressText += ' • Final step!';
+                    }
+                    this.elements.timerStepProgress.textContent = progressText;
+                },
+
+                updateProgressBar() {
+                    const totalEvents = State.timer.executionQueue.length;
+                    const completedEvents = State.timer.currentIndex;
+                    const percentage = totalEvents > 0 ? (completedEvents / totalEvents) * 100 : 0;
+                    this.elements.timerOverallProgressBar.style.width = `${percentage}%`;
+                    this.elements.timerOverallProgress.setAttribute('aria-valuenow', Math.round(percentage));
+                },
+
+                updateFullscreenButton() {
+                    const btn = this.elements.timerFullscreenBtn;
+                    btn.textContent = document.fullscreenElement ? 'Exit Fullscreen ↙️' : 'Fullscreen ↗️';
+                },
+
+                closeAllModals() {
+                    document.querySelectorAll('.modal-overlay').forEach(modal => this.hide(modal));
+                }
+            };
+
+            /**
+             * Manages the timer logic, including starting, pausing, and navigating steps.
+             */
+            const Timer = {
+                async acquireWakeLock() {
+                    if ('wakeLock' in navigator) {
+                        try {
+                            State.timer.wakeLock = await navigator.wakeLock.request('screen');
+                        } catch (err) {
+                            console.error(`Wake Lock Error: ${err.name}, ${err.message}`);
+                        }
+                    }
+                },
+                releaseWakeLock() {
+                    State.timer.wakeLock?.release();
+                    State.timer.wakeLock = null;
+                },
+
+                start(workoutId) {
+                    const workout = WorkoutManager.find(workoutId);
+                    if (!workout) return;
+
+                    State.timer.currentWorkout = workout;
+                    State.timer.executionQueue = this.buildExecutionQueue(workout);
+                    State.timer.currentIndex = -1;
+                    State.timer.state = 'running';
+                    
+                    this.acquireWakeLock();
+                    UI.hide(UI.elements.homeScreen);
+                    UI.show(UI.elements.timerScreen);
+                    
+                    this.runNextStep();
+                },
+
+                buildExecutionQueue(workout) {
+                    const queue = [];
+                    if (workout.prepare > 0) queue.push({ type: 'prepare' });
+                    for (let i = 0; i < workout.sets; i++) {
+                        workout.steps.forEach((step, stepIndex) => queue.push({ type: 'step', set: i + 1, stepIndex: stepIndex }));
+                        if (i < workout.sets - 1 && workout.cooldown > 0) queue.push({ type: 'cooldown', set: i + 1 });
+                    }
+                    return queue;
+                },
+
+                runNextStep() {
+                    clearInterval(State.timer.interval);
+                    State.timer.currentIndex++;
+                    UI.updateProgressBar();
+
+                    UI.elements.timerPrevBtn.disabled = State.timer.currentIndex <= 0;
+
+                    if (State.timer.currentIndex >= State.timer.executionQueue.length) {
+                        this.finish();
+                        return;
+                    }
+
+                    const currentEvent = State.timer.executionQueue[State.timer.currentIndex];
+                    const workout = State.timer.currentWorkout;
+                    let step, data;
+
+                    switch(currentEvent.type) {
+                        case 'prepare':
+                            data = { category: 'Prepare', name: workout.title, duration: workout.prepare, media: workout.prepareMedia };
+                            break;
+                        case 'cooldown':
+                            data = { category: 'Cooldown', name: workout.title, duration: workout.cooldown, media: workout.cooldownMedia };
+                            break;
+                        case 'step':
+                            step = workout.steps[currentEvent.stepIndex];
+                            data = { category: step.type, name: step.name, description: step.description, reps: step.reps, duration: step.duration, media: step.media };
+                            break;
+                    }
+
+                    State.timer.timeLeft = data.duration;
+                    UI.updateTimerUI({ ...data, set: currentEvent.set, stepIndex: currentEvent.stepIndex });
+                    
+                    if (data.duration > 0) {
+                        UI.hide(UI.elements.timerDoneBtn);
+                        State.timer.interval = setInterval(() => this.tick(), 1000);
+                    } else {
+                        UI.show(UI.elements.timerDoneBtn);
+                    }
+                },
+
+                tick() {
+                    State.timer.timeLeft--;
+                    UI.elements.timerCountdown.textContent = this.formatTime(State.timer.timeLeft);
+                    if (State.timer.timeLeft <= 0) {
+                        this.runNextStep();
+                    }
+                },
+
+                pauseResume() {
+                    const btn = UI.elements.timerPauseResumeBtn;
+                    if (State.timer.state === 'running') {
+                        State.timer.state = 'paused';
+                        clearInterval(State.timer.interval);
+                        btn.textContent = 'Resume';
+                        this.releaseWakeLock();
+                    } else if (State.timer.state === 'paused') {
+                        State.timer.state = 'running';
+                        if (State.timer.timeLeft > 0) {
+                            State.timer.interval = setInterval(() => this.tick(), 1000);
+                        }
+                        btn.textContent = 'Pause';
+                        this.acquireWakeLock();
+                    }
+                },
+
+                skip() {
+                    if (State.timer.state === 'paused') this.pauseResume();
+                    this.runNextStep();
+                },
+                
+                prev() {
+                    if (State.timer.currentIndex > 0) {
+                        if (State.timer.state === 'paused') this.pauseResume();
+                        State.timer.currentIndex -= 2;
+                        this.runNextStep();
+                    }
+                },
+
+                quit() {
+                    if (confirm('Are you sure you want to quit this workout?')) {
+                        clearInterval(State.timer.interval);
+                        this.releaseWakeLock();
+                        State.timer.state = 'stopped';
+                        UI.hide(UI.elements.timerScreen);
+                        UI.show(UI.elements.homeScreen);
+                    }
+                },
+
+                finish() {
+                    clearInterval(State.timer.interval);
+                    this.releaseWakeLock();
+                    alert('Workout Complete!');
+                    State.timer.state = 'stopped';
+                    UI.hide(UI.elements.timerScreen);
+                    UI.show(UI.elements.homeScreen);
+                },
+
+                formatTime(seconds) {
+                    const min = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    const sec = (seconds % 60).toString().padStart(2, '0');
+                    return `${min}:${sec}`;
+                }
+            };
+
+            /**
+             * Handles CRUD operations and business logic for workouts.
+             */
+            const WorkoutManager = {
+                find: (id) => State.workouts.find(w => w.id === id),
+                
+                getFilteredAndSorted() {
+                    let workouts = [...State.workouts];
+                    const searchTerm = UI.elements.searchBar.value.toLowerCase();
+                    const sortBy = UI.elements.sortSelect.value;
+
+                    if (searchTerm) {
+                        workouts = workouts.filter(w => 
+                            w.title.toLowerCase().includes(searchTerm) || 
+                            (w.description && w.description.toLowerCase().includes(searchTerm))
+                        );
+                    }
+                    
+                    workouts.sort((a, b) => {
+                        if (a.isFavorite !== b.isFavorite) return a.isFavorite ? -1 : 1;
+                        switch(sortBy) {
+                            case 'name-asc': return a.title.localeCompare(b.title);
+                            case 'name-desc': return b.title.localeCompare(a.title);
+                            case 'date-new': return b.createdAt - a.createdAt;
+                            case 'date-old': return a.createdAt - b.createdAt;
+                            case 'color':
+                                return Object.keys(Config.colors).indexOf(a.color) - Object.keys(Config.colors).indexOf(b.color);
+                            default: return 0;
+                        }
+                    });
+                    return workouts;
+                },
+
+                save() {
+                    const id = UI.elements.workoutId.value;
+                    const title = UI.elements.workoutTitle.value.trim();
+
+                    if (!title) {
+                        alert('Workout title cannot be empty.');
+                        return;
+                    }
+                    
+                    const isTitleDuplicate = State.workouts.some(
+                        w => w.title.toLowerCase() === title.toLowerCase() && w.id !== id
+                    );
+                    if (isTitleDuplicate) {
+                        alert('A workout with this title already exists. Please choose a unique title.');
+                        return;
+                    }
+
+                    const steps = Array.from(document.querySelectorAll('#stepsList .step-item')).map(el => ({
+                        id: el.dataset.id, type: el.dataset.type,
+                        name: el.querySelector('.step-name').value,
+                        description: el.querySelector('.step-description').value,
+                        duration: parseInt(el.querySelector('.step-duration').value, 10) || 0,
+                        reps: parseInt(el.querySelector('.step-reps').value, 10) || 0,
+                        media: el.querySelector('.step-media').value,
+                    }));
+
+                    const workoutData = {
+                        id: id || `w-${Date.now()}`,
+                        title: title,
+                        description: UI.elements.workoutDescription.value.trim(),
+                        color: UI.elements.workoutColor.value,
+                        prepare: parseInt(UI.elements.workoutPrepare.value, 10) || 0,
+                        prepareMedia: UI.elements.prepareMedia.value.trim(),
+                        sets: parseInt(UI.elements.workoutSets.value, 10),
+                        cooldown: parseInt(UI.elements.workoutCooldown.value, 10) || 0,
+                        cooldownMedia: UI.elements.cooldownMedia.value.trim(),
+                        steps: steps,
+                    };
+                    
+                    if (workoutData.sets < 1 || workoutData.steps.length === 0) {
+                        alert('Please have at least 1 Set and add at least one Step.');
+                        return;
+                    }
+
+                    if (id) {
+                        const index = State.workouts.findIndex(w => w.id === id);
+                        const existing = State.workouts[index];
+                        State.workouts[index] = { ...existing, ...workoutData };
+                    } else {
+                        workoutData.createdAt = Date.now();
+                        workoutData.isFavorite = false;
+                        State.workouts.push(workoutData);
+                    }
+                    
+                    State.save();
+                    UI.renderWorkouts();
+                    UI.closeEditor();
+                },
+
+                toggleFavorite(id) {
+                    const workout = this.find(id);
+                    if (workout) {
+                        workout.isFavorite = !workout.isFavorite;
+                        State.save();
+                        UI.renderWorkouts();
+                    }
+                },
+
+                duplicate(id) {
+                    const original = this.find(id);
+                    if (original) {
+                        let newTitle = `${original.title} (Copy)`;
+                        let counter = 2;
+                        while (State.workouts.some(w => w.title === newTitle)) {
+                            newTitle = `${original.title} (Copy ${counter++})`;
+                        }
+
+                        const newWorkout = JSON.parse(JSON.stringify(original));
+                        newWorkout.id = `w-${Date.now()}`;
+                        newWorkout.title = newTitle;
+                        newWorkout.isFavorite = false;
+                        newWorkout.createdAt = Date.now();
+                        State.workouts.push(newWorkout);
+                        State.save();
+                        UI.renderWorkouts();
+                    }
+                },
+                
+                delete(id) {
+                    if (confirm('Are you sure you want to delete this workout?')) {
+                        State.workouts = State.workouts.filter(w => w.id !== id);
+                        State.save();
+                        UI.renderWorkouts();
+                    }
+                },
+
+                exportWorkout(id) {
+                    const workout = this.find(id);
+                    if (workout) {
+                        const dataStr = JSON.stringify(workout, null, 2);
+                        const blob = new Blob([dataStr], {type: 'application/json'});
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${workout.title.replace(/\s/g, '_')}.json`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    }
+                },
+
+                importWorkout(file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const workout = JSON.parse(event.target.result);
+                            if (workout.id && workout.title && Array.isArray(workout.steps)) {
+                                if (this.find(workout.id) || State.workouts.some(w => w.title === workout.title)) {
+                                    workout.id = `w-${Date.now()}`;
+                                    workout.title = `${workout.title} (Imported)`;
+                                }
+                                State.workouts.push(workout);
+                                State.save();
+                                UI.renderWorkouts();
+                                alert('Workout imported successfully!');
+                            } else {
+                                alert('Invalid workout file format.');
+                            }
+                        } catch (err) {
+                            alert('Error reading file. Make sure it is a valid JSON.');
+                        }
+                    };
+                    reader.readAsText(file);
+                },
+
+                showPreview(id) {
+                    const workout = this.find(id);
+                    if (!workout) return;
+                    
+                    let html = `
+                        <h3>${workout.title}</h3>
+                        <p>${workout.description || 'No description.'}</p>
+                        <p><strong>Color:</strong> <span style="display:inline-block;width:15px;height:15px;background-color:${Config.colors[workout.color]};border-radius:50%; vertical-align:middle;"></span></p>
+                        <p><strong>Sets:</strong> ${workout.sets}</p>
+                        <p><strong>Prepare:</strong> ${workout.prepare}s | <strong>Cooldown:</strong> ${workout.cooldown}s</p>
+                        <h4>Steps:</h4>
+                        <ol>`;
+                    
+                    workout.steps.forEach(step => {
+                        html += `<li><strong>${step.name} (${step.type})</strong> - 
+                            ${step.duration > 0 ? `${step.duration}s` : 'Manual'} 
+                            ${step.reps > 0 ? `, ${step.reps} reps` : ''}
+                        </li>`;
+                    });
+                    
+                    html += `</ol>`;
+                    UI.elements.previewContent.innerHTML = html;
+                    UI.show(UI.elements.previewModal);
+                }
+            };
+
+            /**
+             * Handles import/export of the entire user profile.
+             */
+            const UserDataManager = {
+                export() {
+                    const userData = {
+                        settings: State.settings,
+                        workouts: State.workouts
+                    };
+                    const dataStr = JSON.stringify(userData, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'tabata_backup.json';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                },
+
+                import(file, isFromSetup = false) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const userData = JSON.parse(event.target.result);
+                            if (userData.settings && Array.isArray(userData.workouts)) {
+                                State.settings = userData.settings;
+                                State.workouts = userData.workouts;
+                                State.save();
+                                UI.applySettings();
+                                UI.renderWorkouts();
+                                UI.closeAllModals();
+                                if (isFromSetup) {
+                                    UI.hide(UI.elements.setupScreen);
+                                    UI.show(UI.elements.homeScreen);
+                                }
+                                alert('User data imported successfully!');
+                            } else {
+                                alert('Invalid user data file format.');
+                            }
+                        } catch (err) {
+                            alert('Error reading file. Make sure it is a valid JSON.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            
+            /**
+             * Centralizes all event listener attachments.
+             */
+            const EventListeners = {
+                init() {
+                    // Setup
+                    UI.elements.setupForm.addEventListener('submit', this.handleSetupSubmit);
+                    UI.elements.importSetupBtn.addEventListener('click', () => UI.elements.importUserDataInput.click());
+
+                    // Home Screen
+                    UI.elements.newWorkoutBtn.addEventListener('click', () => UI.openEditor());
+                    UI.elements.importWorkoutBtn.addEventListener('click', () => UI.elements.importWorkoutFileInput.click());
+                    UI.elements.importWorkoutFileInput.addEventListener('change', this.handleImportWorkoutFile);
+                    UI.elements.mainSettingsBtn.addEventListener('click', this.openMainSettings);
+                    UI.elements.searchBar.addEventListener('input', () => UI.renderWorkouts());
+                    UI.elements.sortSelect.addEventListener('change', () => UI.renderWorkouts());
+
+                    // Event Delegation for dynamic content
+                    UI.elements.workoutList.addEventListener('click', this.handleWorkoutCardAction);
+                    UI.elements.stepsList.addEventListener('click', this.handleStepAction);
+                    
+                    // Editor
+                    UI.elements.saveWorkoutBtn.addEventListener('click', () => WorkoutManager.save());
+                    UI.elements.cancelEditorBtn.addEventListener('click', () => UI.closeEditor());
+                    UI.elements.addWorkStepBtn.addEventListener('click', () => UI.addStepToEditor('work'));
+                    UI.elements.addRestStepBtn.addEventListener('click', () => UI.addStepToEditor('rest'));
+                    
+                    // Modals & User Data
+                    UI.elements.mainSettingsForm.addEventListener('submit', this.handleSaveSettings);
+                    document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', () => UI.closeAllModals()));
+                    UI.elements.exportUserDataBtn.addEventListener('click', () => UserDataManager.export());
+                    UI.elements.importUserDataBtn.addEventListener('click', () => UI.elements.importUserDataInput.click());
+                    UI.elements.importUserDataInput.addEventListener('change', (e) => this.handleImportUserDataFile(e));
+
+                    // Timer
+                    UI.elements.timerPauseResumeBtn.addEventListener('click', () => Timer.pauseResume());
+                    UI.elements.timerQuitBtn.addEventListener('click', () => Timer.quit());
+                    UI.elements.timerDoneBtn.addEventListener('click', () => Timer.runNextStep());
+                    UI.elements.timerSkipBtn.addEventListener('click', () => Timer.skip());
+                    UI.elements.timerPrevBtn.addEventListener('click', () => Timer.prev());
+                    UI.elements.timerFullscreenBtn.addEventListener('click', this.handleFullscreenToggle);
+                    document.addEventListener('fullscreenchange', () => UI.updateFullscreenButton());
+                },
+
+                handleSetupSubmit(e) {
+                    e.preventDefault();
+                    State.settings.username = UI.elements.setupUsername.value.trim();
+                    State.settings.theme = document.querySelector('input[name="theme"]:checked').value;
+                    if (State.settings.username) {
+                        State.save();
+                        UI.applySettings();
+                        UI.renderWorkouts();
+                        UI.hide(UI.elements.setupScreen);
+                        UI.show(UI.elements.homeScreen);
+                    }
+                },
+
+                handleImportWorkoutFile(e) {
+                    const file = e.target.files[0];
+                    if (file) WorkoutManager.importWorkout(file);
+                    e.target.value = '';
+                },
+
+                handleImportUserDataFile(e) {
+                    const file = e.target.files[0];
+                    const isFromSetup = !UI.elements.setupScreen.classList.contains('hidden');
+                    if (file) UserDataManager.import(file, isFromSetup);
+                    e.target.value = '';
+                },
+
+                handleWorkoutCardAction(e) {
+                    const target = e.target.closest('[data-action]');
+                    if (!target) return;
+                    
+                    const action = target.dataset.action;
+                    const workoutId = target.closest('.workout-card').dataset.id;
+                    const actions = {
+                        start: () => Timer.start(workoutId),
+                        edit: () => UI.openEditor(WorkoutManager.find(workoutId)),
+                        favorite: () => WorkoutManager.toggleFavorite(workoutId),
+                        duplicate: () => WorkoutManager.duplicate(workoutId),
+                        exportWorkout: () => WorkoutManager.exportWorkout(workoutId),
+                        delete: () => WorkoutManager.delete(workoutId),
+                        preview: () => WorkoutManager.showPreview(workoutId)
+                    };
+                    if (actions[action]) actions[action]();
+                },
+                
+                handleStepAction(e) {
+                    const target = e.target.closest('[data-action]');
+                    if (!target) return;
+
+                    const stepEl = target.closest('.step-item');
+                    const action = target.dataset.action;
+                    
+                    if (action === 'move-up' && stepEl.previousElementSibling) {
+                        stepEl.parentNode.insertBefore(stepEl, stepEl.previousElementSibling);
+                    } else if (action === 'move-down' && stepEl.nextElementSibling) {
+                        stepEl.parentNode.insertBefore(stepEl.nextElementSibling, stepEl);
+                    } else if (action === 'delete') {
+                        stepEl.remove();
+                    }
+                },
+
+                openMainSettings() {
+                    UI.elements.settingsUsername.value = State.settings.username;
+                    UI.elements.settingsTheme.value = State.settings.theme;
+                    UI.elements.settingsView.value = State.settings.view;
+                    UI.show(UI.elements.mainSettingsModal);
+                },
+
+                handleSaveSettings(e) {
+                    e.preventDefault();
+                    State.settings.username = UI.elements.settingsUsername.value.trim();
+                    State.settings.theme = UI.elements.settingsTheme.value;
+                    State.settings.view = UI.elements.settingsView.value;
+                    State.save();
+                    UI.applySettings();
+                    UI.renderWorkouts();
+                    UI.closeAllModals();
+                },
+                
+                handleFullscreenToggle() {
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen().catch(err => {
+                            alert(`Error enabling full-screen: ${err.message}`);
+                        });
+                    } else {
+                        document.exitFullscreen();
+                    }
+                }
+            };
+            
+            App.init();
+        });
+    </script>
+</body>
+</html>
