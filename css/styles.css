@@ -256,7 +256,25 @@ form button[type="submit"] {
 .card-description { color: var(--text-secondary); margin-bottom: 1.5rem; }
 .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
 
-.card-settings-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); }
+.card-settings-btn { 
+    background: none; 
+    border: none; 
+    font-size: 1.5rem; 
+    cursor: pointer; 
+    color: var(--text-secondary); 
+    /* Prevent blue tap highlighting on mobile */
+    -webkit-tap-highlight-color: transparent;
+}
+.card-settings-btn:focus { 
+    outline: none; 
+    background: none; 
+    /* Add subtle focus indicator for accessibility */
+    box-shadow: 0 0 0 2px var(--accent-primary); 
+    border-radius: 4px; 
+}
+.card-settings-btn:active { 
+    background: none; 
+}
 .settings-menu-wrapper { position: relative; }
 .settings-menu {
     display: none;
