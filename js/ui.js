@@ -114,6 +114,9 @@ export const UI = {
         stepEl.querySelector('.step-media').value = data.media || '';
 
         this.elements.stepsList.appendChild(stepEl);
+        
+        // Update button visibility after adding step
+        window.EventListeners.updateStepButtonVisibility();
     },
 
     buildColorSelector() {

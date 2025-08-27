@@ -89,20 +89,164 @@ export const EventListeners = {
         if (actions[action]) actions[action]();
     },
     
+    updateStepButtonVisibility() {
+        const stepItems = document.querySelectorAll('#stepsList .step-item');
+        stepItems.forEach((stepEl, index) => {
+            const moveUpBtn = stepEl.querySelector('[data-action="move-up"]');
+            const moveDownBtn = stepEl.querySelector('[data-action="move-down"]');
+            
+            // Hide move-up button for first step
+            if (index === 0) {
+                moveUpBtn.classList.add('hidden');
+                moveUpBtn.setAttribute('aria-hidden', 'true');
+            } else {
+                moveUpBtn.classList.remove('hidden');
+                moveUpBtn.setAttribute('aria-hidden', 'false');
+            }
+            
+            // Hide move-down button for last step
+            if (index === stepItems.length - 1) {
+                moveDownBtn.classList.add('hidden');
+                moveDownBtn.setAttribute('aria-hidden', 'true');
+            } else {
+                moveDownBtn.classList.remove('hidden');
+                moveDownBtn.setAttribute('aria-hidden', 'false');
+            }
+        });
+    },
+    
     handleStepAction(e) {
+        e.preventDefault(); // Prevent any default behaviors
+        e.stopPropagation(); // Stop event bubbling
+        
         const target = e.target.closest('[data-action]');
         if (!target) return;
 
         const stepEl = target.closest('.step-item');
         const action = target.dataset.action;
         
-        if (action === 'move-up' && stepEl.previousElementSibling) {
-            stepEl.parentNode.insertBefore(stepEl, stepEl.previousElementSibling);
-        } else if (action === 'move-down' && stepEl.nextElementSibling) {
-            stepEl.parentNode.insertBefore(stepEl.nextElementSibling, stepEl);
-        } else if (action === 'delete') {
-            stepEl.remove();
+        try {
+            if (action === 'delete') {
+                // Add exit animation before removal
+                stepEl.style.transform = 'scale(0.95)';
+                stepEl.style.opacity = '0';
+                setTimeout(() => {
+                    stepEl.remove();
+                    window.EventListeners.updateStepButtonVisibility();
+                }, 300);
+                return;
+            }
+            
+            if (action === 'move-up' || action === 'move-down') {
+                window.EventListeners.animateStepReorder(stepEl, action);
+            }
+        } catch (error) {
+            console.error('Error in handleStepAction:', error);
+            // Fallback to simple reordering without animation
+            window.EventListeners.simpleStepReorder(stepEl, action);
         }
+    },
+
+    simpleStepReorder(stepEl, direction) {
+        const targetSibling = direction === 'move-up' ? stepEl.previousElementSibling : stepEl.nextElementSibling;
+        if (!targetSibling) return;
+        
+        // Simple DOM reordering without animation
+        if (direction === 'move-up') {
+            stepEl.parentNode.insertBefore(stepEl, targetSibling);
+        } else {
+            stepEl.parentNode.insertBefore(targetSibling, stepEl);
+        }
+        
+        // Update button visibility
+        window.EventListeners.updateStepButtonVisibility();
+    },
+
+    animateStepReorder(stepEl, direction) {
+        const targetSibling = direction === 'move-up' ? stepEl.previousElementSibling : stepEl.nextElementSibling;
+        
+        if (!targetSibling) return; // No valid move
+        
+        // Prevent multiple simultaneous animations
+        if (stepEl.classList.contains('animating') || targetSibling.classList.contains('animating')) {
+            return;
+        }
+        
+        try {
+            // Store form data before animation
+            const stepData = window.EventListeners.extractStepFormData(stepEl);
+            const targetData = window.EventListeners.extractStepFormData(targetSibling);
+            
+            // Add moving class for visual feedback
+            stepEl.classList.add('moving');
+            
+            // Simplified animation approach - just perform the DOM operation with a brief delay
+            setTimeout(() => {
+                // Perform the actual DOM reordering
+                if (direction === 'move-up') {
+                    stepEl.parentNode.insertBefore(stepEl, targetSibling);
+                } else {
+                    stepEl.parentNode.insertBefore(targetSibling, stepEl);
+                }
+                
+                // Restore form data
+                window.EventListeners.restoreStepFormData(stepEl, stepData);
+                window.EventListeners.restoreStepFormData(targetSibling, targetData);
+                
+                // Clean up classes
+                stepEl.classList.remove('moving');
+                
+                // Update button visibility after reordering
+                window.EventListeners.updateStepButtonVisibility();
+                
+                // Announce change to screen readers
+                const stepName = stepEl.querySelector('.step-name').value || 'Unnamed step';
+                const announcement = `${stepName} moved ${direction === 'move-up' ? 'up' : 'down'}`;
+                window.EventListeners.announceToScreenReader(announcement);
+                
+            }, 100); // Reduced timeout for faster response
+            
+        } catch (error) {
+            console.error('Error in animateStepReorder:', error);
+            // Fallback to simple reordering
+            window.EventListeners.simpleStepReorder(stepEl, direction);
+        }
+    },
+
+    extractStepFormData(stepEl) {
+        return {
+            name: stepEl.querySelector('.step-name').value,
+            description: stepEl.querySelector('.step-description').value,
+            duration: stepEl.querySelector('.step-duration').value,
+            reps: stepEl.querySelector('.step-reps').value,
+            media: stepEl.querySelector('.step-media').value
+        };
+    },
+
+    restoreStepFormData(stepEl, data) {
+        stepEl.querySelector('.step-name').value = data.name;
+        stepEl.querySelector('.step-description').value = data.description;
+        stepEl.querySelector('.step-duration').value = data.duration;
+        stepEl.querySelector('.step-reps').value = data.reps;
+        stepEl.querySelector('.step-media').value = data.media;
+    },
+
+    announceToScreenReader(message) {
+        // Create a temporary element for screen reader announcements
+        let announcer = document.getElementById('step-announcer');
+        if (!announcer) {
+            announcer = document.createElement('div');
+            announcer.id = 'step-announcer';
+            announcer.setAttribute('aria-live', 'polite');
+            announcer.setAttribute('aria-atomic', 'true');
+            announcer.style.position = 'absolute';
+            announcer.style.left = '-10000px';
+            announcer.style.width = '1px';
+            announcer.style.height = '1px';
+            announcer.style.overflow = 'hidden';
+            document.body.appendChild(announcer);
+        }
+        announcer.textContent = message;
     },
 
     openMainSettings() {
