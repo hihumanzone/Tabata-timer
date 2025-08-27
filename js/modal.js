@@ -177,5 +177,86 @@ export const Modal = {
             type: 'alert',
             confirmText: 'OK'
         });
+    },
+
+    /**
+     * Show a workout completion modal with celebration styling
+     * @param {Object} options - Modal configuration
+     * @param {string} options.title - Modal title (default: 'Workout Complete!')
+     * @param {string} options.message - Modal message (default: 'Great job!')
+     * @param {string} options.confirmText - Confirm button text (default: 'Awesome!')
+     * @returns {Promise<boolean>} - true when confirmed
+     */
+    showWorkoutComplete(options = {}) {
+        return new Promise((resolve) => {
+            const {
+                title = 'Workout Complete!',
+                message = 'Great job! You\'ve successfully completed your workout.',
+                confirmText = 'Awesome!'
+            } = options;
+
+            // Create celebration modal HTML with larger styling
+            const modalHTML = `
+                <div class="custom-modal-overlay workout-complete-modal" role="dialog" aria-modal="true" aria-labelledby="workout-complete-title">
+                    <div class="custom-modal-content workout-complete-content">
+                        <div class="workout-complete-celebration">
+                            <div class="celebration-icon">🎉</div>
+                        </div>
+                        <div class="custom-modal-header">
+                            <h2 id="workout-complete-title">${title}</h2>
+                        </div>
+                        <div class="custom-modal-body">
+                            <p>${message}</p>
+                        </div>
+                        <div class="custom-modal-actions">
+                            <button class="custom-modal-confirm primary">${confirmText}</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Create modal element
+            const modalElement = document.createElement('div');
+            modalElement.innerHTML = modalHTML;
+            const modal = modalElement.firstElementChild;
+
+            // Store for focus management
+            this.previousFocus = document.activeElement;
+            this.activeModal = modal;
+
+            // Add to DOM
+            document.body.appendChild(modal);
+
+            // Set up event listeners
+            const confirmBtn = modal.querySelector('.custom-modal-confirm');
+
+            const handleConfirm = () => {
+                this.hide(modal);
+                resolve(true);
+            };
+
+            confirmBtn.addEventListener('click', handleConfirm);
+
+            // Handle keyboard navigation
+            modal.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' || e.key === 'Enter') {
+                    e.preventDefault();
+                    handleConfirm();
+                }
+            });
+
+            // Set up focus trap
+            this.setupFocusTrap(modal);
+
+            // Focus the confirm button
+            setTimeout(() => {
+                confirmBtn.focus();
+            }, 100);
+
+            // Add show animation
+            requestAnimationFrame(() => {
+                modal.classList.add('show');
+            });
+        });
     }
 };

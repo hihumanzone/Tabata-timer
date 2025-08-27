@@ -140,7 +140,11 @@ export const Timer = {
     finish() {
         clearInterval(State.timer.interval);
         this.releaseWakeLock();
-        window.Notifications.success('Workout Complete! Great job!');
+        window.Modal.showWorkoutComplete({
+            title: 'Workout Complete!',
+            message: 'Great job! You\'ve successfully completed your workout.',
+            confirmText: 'Awesome!'
+        });
         State.timer.state = 'stopped';
         window.UI.hide(window.UI.elements.timerScreen);
         window.UI.show(window.UI.elements.homeScreen);

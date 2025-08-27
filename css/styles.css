@@ -109,6 +109,17 @@ button.secondary:hover:not(:disabled) { background-color: var(--border-color); }
 button.danger { background-color: var(--danger-color); }
 button.danger:hover { background-color: color-mix(in srgb, var(--danger-color), #000 10%); }
 
+/* Settings Icon */
+.settings-icon {
+    display: inline-block;
+    vertical-align: middle;
+    transition: transform 0.2s ease;
+}
+
+button:hover .settings-icon {
+    transform: rotate(30deg);
+}
+
 input, select, textarea {
     font-family: inherit;
     font-size: 1rem;
@@ -126,6 +137,22 @@ input:focus, select:focus, textarea:focus {
 
 .form-group { margin-bottom: 1rem; }
 .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+
+/* Form button alignment */
+form button[type="submit"] {
+    display: block;
+    margin: 1.5rem auto 0 auto;
+    width: auto;
+    min-width: 150px;
+}
+
+#setupForm button[type="submit"],
+#mainSettingsForm button[type="submit"] {
+    display: block;
+    margin: 1.5rem auto 0 auto;
+    width: auto;
+    min-width: 150px;
+}
 
 /* --- Modals --- */
 .modal-overlay {
@@ -577,6 +604,67 @@ input:focus, select:focus, textarea:focus {
     min-width: 80px;
 }
 
+/* Workout Completion Modal */
+.workout-complete-modal .custom-modal-content {
+    max-width: 600px;
+    text-align: center;
+}
+
+.workout-complete-content {
+    padding: 2rem;
+}
+
+.workout-complete-celebration {
+    margin-bottom: 1.5rem;
+}
+
+.celebration-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: celebrate 1s ease-in-out;
+}
+
+@keyframes celebrate {
+    0% { transform: scale(0) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(180deg); }
+    100% { transform: scale(1) rotate(360deg); }
+}
+
+.workout-complete-modal .custom-modal-header {
+    border-bottom: none;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.workout-complete-modal .custom-modal-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 0.5rem;
+}
+
+.workout-complete-modal .custom-modal-body {
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.workout-complete-modal .custom-modal-body p {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.workout-complete-modal .custom-modal-actions {
+    padding: 0;
+    justify-content: center;
+}
+
+.workout-complete-modal .custom-modal-actions button {
+    font-size: 1.125rem;
+    padding: 1rem 2rem;
+    min-width: 150px;
+}
+
 /* --- Custom Notification System --- */
 .notifications-container {
     position: fixed;
@@ -779,7 +867,8 @@ input:focus, select:focus, textarea:focus {
 
 .custom-dropdown-option:hover,
 .custom-dropdown-option.focused {
-    background-color: var(--bg-tertiary);
+    background-color: transparent;
+    color: var(--accent-primary);
 }
 
 .custom-dropdown-option[aria-selected="true"] {
@@ -789,7 +878,8 @@ input:focus, select:focus, textarea:focus {
 
 .custom-dropdown-option[aria-selected="true"]:hover,
 .custom-dropdown-option[aria-selected="true"].focused {
-    background-color: var(--bg-tertiary);
+    background-color: transparent;
+    color: var(--accent-primary);
 }
 
 /* Mobile responsiveness for notifications */
