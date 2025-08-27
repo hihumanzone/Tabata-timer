@@ -49,6 +49,4 @@ export const App = {
 
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
-    
-    window.debugViewport = () => ViewportManager.logViewportInfo();
 });
