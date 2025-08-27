@@ -173,14 +173,31 @@ export const EventListeners = {
         }
         
         try {
+            // Store scroll position before reordering
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
             // Store form data BEFORE any DOM manipulation
             const stepData = window.EventListeners.extractStepFormData(stepEl);
             const targetData = window.EventListeners.extractStepFormData(targetSibling);
             
-            // Add moving class for visual feedback
-            stepEl.classList.add('moving');
+            // Phase 1: Prepare animation - add base animation classes
+            stepEl.classList.add('animating', 'moving');
+            targetSibling.classList.add('animating', 'target-sliding');
             
-            // Simplified animation approach - just perform the DOM operation with a brief delay
+            // Phase 2: Start the sliding animation after a brief moment to ensure CSS has applied
+            requestAnimationFrame(() => {
+                if (direction === 'move-up') {
+                    // Moving step slides up, target step slides down to make space
+                    stepEl.classList.add('slide-up');
+                    targetSibling.classList.add('slide-down');
+                } else {
+                    // Moving step slides down, target step slides up to make space
+                    stepEl.classList.add('slide-down');
+                    targetSibling.classList.add('slide-up');
+                }
+            });
+            
+            // Phase 3: Wait for the slide animation to complete, then perform DOM reordering
             setTimeout(() => {
                 // Perform the actual DOM reordering
                 if (direction === 'move-up') {
@@ -189,27 +206,49 @@ export const EventListeners = {
                     stepEl.parentNode.insertBefore(targetSibling, stepEl);
                 }
                 
-                // Restore form data IMMEDIATELY after DOM manipulation
+                // Phase 4: Clean up slide transforms immediately after DOM manipulation
+                stepEl.classList.remove('slide-up', 'slide-down');
+                targetSibling.classList.remove('slide-up', 'slide-down');
+                
+                // Phase 5: Allow elements to settle in new positions
                 setTimeout(() => {
+                    // Restore form data
                     window.EventListeners.restoreStepFormData(stepEl, stepData);
                     window.EventListeners.restoreStepFormData(targetSibling, targetData);
                     
-                    // Clean up classes
-                    stepEl.classList.remove('moving');
+                    // Phase 6: Final cleanup and state updates
+                    setTimeout(() => {
+                        // Clean up all animation classes
+                        stepEl.classList.remove('moving', 'animating');
+                        targetSibling.classList.remove('animating', 'target-sliding');
+                        
+                        // Update button visibility after reordering
+                        window.EventListeners.updateStepButtonVisibility();
+                        
+                        // Restore scroll position to prevent jumping
+                        window.scrollTo({
+                            top: scrollTop,
+                            behavior: 'auto' // Use auto to prevent additional animation conflicts
+                        });
+                        
+                        // Announce change to screen readers
+                        const stepName = stepData.name || 'Unnamed step';
+                        const announcement = `${stepName} moved ${direction === 'move-up' ? 'up' : 'down'}`;
+                        window.EventListeners.announceToScreenReader(announcement);
+                    }, 100); // Allow time for form data restoration
                     
-                    // Update button visibility after reordering
-                    window.EventListeners.updateStepButtonVisibility();
-                    
-                    // Announce change to screen readers
-                    const stepName = stepData.name || 'Unnamed step';
-                    const announcement = `${stepName} moved ${direction === 'move-up' ? 'up' : 'down'}`;
-                    window.EventListeners.announceToScreenReader(announcement);
-                }, 10); // Very brief delay to ensure DOM is stable
+                }, 50); // Brief delay for DOM settling
                 
-            }, 100); // Reduced timeout for faster response
+            }, 600); // Match the CSS transition duration (600ms)
             
         } catch (error) {
             console.error('Error in animateStepReorder:', error);
+            // Clean up any partial animation state
+            [stepEl, targetSibling].forEach(el => {
+                if (el) {
+                    el.classList.remove('moving', 'animating', 'target-sliding', 'slide-up', 'slide-down');
+                }
+            });
             // Fallback to simple reordering
             window.EventListeners.simpleStepReorder(stepEl, direction);
         }
