@@ -9,6 +9,11 @@
         :root {
             --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             
+            /* Dynamic viewport height - will be set by JavaScript */
+            --vh-dynamic: 100vh;
+            --vh-small: 100svh; /* Small viewport height for better mobile support */
+            --vh-large: 100lvh; /* Large viewport height */
+            
             /* Light Theme (Default) */
             --bg-primary: #f4f7f9;
             --bg-secondary: #ffffff;
@@ -335,15 +340,20 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%;
-            height: 100vh; /* Fallback */
-            height: 100dvh;
+            height: 100vh; /* Fallback for older browsers */
+            height: var(--vh-dynamic, 100vh); /* Dynamic viewport height */
             background-color: var(--bg-primary);
             z-index: 1100;
             display: flex;
             flex-direction: column;
             text-align: center;
             padding: 1rem;
+            padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+            padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+            padding-left: calc(1rem + env(safe-area-inset-left, 0px));
+            padding-right: calc(1rem + env(safe-area-inset-right, 0px));
             color: var(--text-primary);
+            box-sizing: border-box;
         }
         #timerContent {
             display: flex;
@@ -423,6 +433,38 @@
         @media (max-width: 768px) {
             .home-header { flex-direction: column; align-items: flex-start; }
             .grid-2 { grid-template-columns: 1fr; }
+            
+            /* Enhanced mobile timer screen support */
+            #timerScreen {
+                /* Use small viewport height on mobile for better browser compatibility */
+                height: var(--vh-small, var(--vh-dynamic, 100vh));
+                padding: 0.75rem;
+                padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));
+                padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+            }
+            
+            #timerCountdown { 
+                font-size: clamp(3.5rem, 18vw, 7rem);
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 600px) {
+            /* Better landscape support for mobile devices */
+            #timerScreen {
+                height: var(--vh-large, var(--vh-dynamic, 100vh));
+                padding: 0.5rem;
+                padding-top: calc(0.5rem + env(safe-area-inset-top, 0px));
+                padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+            }
+            
+            #timerContent {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+            
+            #timerCountdown { 
+                font-size: clamp(3rem, 15vw, 6rem);
+            }
         }
 
         @media (orientation: landscape) {
@@ -435,7 +477,7 @@
                 flex: 1 1 50%;
                 margin: 0;
                 height: 100%;
-                max-height: 80vh;
+                max-height: calc(var(--vh-dynamic, 100vh) * 0.8);
             }
             #timerScreen.media-visible .timer-details-wrapper {
                 flex: 1 1 50%;
@@ -738,6 +780,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const App = {
                 init() {
+                    ViewportManager.init();
                     UI.cacheDOMElements();
                     State.load();
                     EventListeners.init();
@@ -759,6 +802,67 @@
                 colors: {
                     'red': '#ff3b30', 'orange': '#ff9500', 'yellow': '#ffcc00', 
                     'green': '#34c759', 'blue': '#007aff', 'indigo': '#5856d6', 'purple': '#af52de'
+                }
+            };
+
+            /**
+             * Manages dynamic viewport height for better cross-browser compatibility.
+             * Specifically addresses Chrome Android viewport height issues.
+             */
+            const ViewportManager = {
+                init() {
+                    this.setDynamicViewportHeight();
+                    this.setupViewportListeners();
+                },
+
+                setDynamicViewportHeight() {
+                    // Calculate actual viewport height
+                    const vh = window.innerHeight * 0.01;
+                    
+                    // Set CSS custom property
+                    document.documentElement.style.setProperty('--vh-dynamic', `${vh * 100}px`);
+                    
+                    // Also set fallbacks for browsers that support new viewport units
+                    if (CSS.supports('height', '100svh')) {
+                        document.documentElement.style.setProperty('--vh-small', '100svh');
+                    }
+                    if (CSS.supports('height', '100lvh')) {
+                        document.documentElement.style.setProperty('--vh-large', '100lvh');
+                    }
+                },
+
+                setupViewportListeners() {
+                    // Update on window resize
+                    let resizeTimeout;
+                    window.addEventListener('resize', () => {
+                        clearTimeout(resizeTimeout);
+                        resizeTimeout = setTimeout(() => {
+                            this.setDynamicViewportHeight();
+                        }, 150);
+                    });
+
+                    // Update on orientation change (important for mobile devices)
+                    if ('orientation' in screen) {
+                        screen.orientation.addEventListener('change', () => {
+                            setTimeout(() => {
+                                this.setDynamicViewportHeight();
+                            }, 300); // Small delay for orientation change completion
+                        });
+                    } else {
+                        // Fallback for older browsers
+                        window.addEventListener('orientationchange', () => {
+                            setTimeout(() => {
+                                this.setDynamicViewportHeight();
+                            }, 300);
+                        });
+                    }
+
+                    // Update on visual viewport changes (addresses mobile browser UI changes)
+                    if ('visualViewport' in window) {
+                        window.visualViewport.addEventListener('resize', () => {
+                            this.setDynamicViewportHeight();
+                        });
+                    }
                 }
             };
 
