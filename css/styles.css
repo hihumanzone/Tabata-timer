@@ -886,12 +886,12 @@ form button[type="submit"] {
 
 .custom-dropdown-option:hover,
 .custom-dropdown-option.focused {
-    background-color: transparent;
+    background-color: transparent !important;
     color: var(--accent-primary);
 }
 
 .custom-dropdown-option:active {
-    background-color: transparent;
+    background-color: transparent !important;
     color: var(--accent-primary);
 }
 
@@ -903,7 +903,7 @@ form button[type="submit"] {
 .custom-dropdown-option[aria-selected="true"]:hover,
 .custom-dropdown-option[aria-selected="true"].focused,
 .custom-dropdown-option[aria-selected="true"]:active {
-    background-color: transparent;
+    background-color: transparent !important;
     color: var(--accent-primary);
 }
 

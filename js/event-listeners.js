@@ -12,7 +12,7 @@ export const EventListeners = {
         window.UI.elements.newWorkoutBtn.addEventListener('click', () => window.UI.openEditor());
         window.UI.elements.importWorkoutBtn.addEventListener('click', () => window.UI.elements.importWorkoutFileInput.click());
         window.UI.elements.importWorkoutFileInput.addEventListener('change', this.handleImportWorkoutFile);
-        window.UI.elements.mainSettingsBtn.addEventListener('click', this.openMainSettings);
+        window.UI.elements.mainSettingsBtn.addEventListener('click', this.openMainSettings.bind(this));
         window.UI.elements.searchBar.addEventListener('input', () => window.UI.renderWorkouts());
         window.UI.elements.sortSelect.addEventListener('change', () => window.UI.renderWorkouts());
 
@@ -24,7 +24,7 @@ export const EventListeners = {
         window.UI.elements.addWorkStepBtn.addEventListener('click', () => window.UI.addStepToEditor('work'));
         window.UI.elements.addRestStepBtn.addEventListener('click', () => window.UI.addStepToEditor('rest'));
         
-        window.UI.elements.mainSettingsForm.addEventListener('submit', this.handleSaveSettings);
+        window.UI.elements.mainSettingsForm.addEventListener('submit', this.handleSaveSettings.bind(this));
         
         // Theme preview functionality
         window.UI.elements.settingsTheme.addEventListener('change', this.handleThemePreview.bind(this));
@@ -235,6 +235,9 @@ export const EventListeners = {
         }
         
         window.UI.show(window.UI.elements.mainSettingsModal);
+        
+        // Add overlay click and escape key handlers for settings modal
+        this.addSettingsModalHandlers();
     },
 
     handleSaveSettings(e) {
@@ -248,6 +251,9 @@ export const EventListeners = {
         
         // Clear original theme since settings were saved
         this.originalTheme = null;
+        
+        // Clean up event handlers
+        this.removeSettingsModalHandlers();
         
         window.UI.closeAllModals();
     },
@@ -267,13 +273,61 @@ export const EventListeners = {
         document.body.dataset.theme = e.target.value;
     },
 
+    addSettingsModalHandlers() {
+        const modal = window.UI.elements.mainSettingsModal;
+        
+        // Remove any existing handlers to prevent duplicates
+        this.removeSettingsModalHandlers();
+        
+        // Overlay click handler
+        this.settingsOverlayClickHandler = (e) => {
+            if (e.target === modal) {
+                this.handleModalClose(e);
+            }
+        };
+        
+        // Escape key handler
+        this.settingsEscapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                this.handleModalClose(e);
+            }
+        };
+        
+        modal.addEventListener('click', this.settingsOverlayClickHandler);
+        document.addEventListener('keydown', this.settingsEscapeHandler);
+    },
+
+    removeSettingsModalHandlers() {
+        const modal = window.UI.elements.mainSettingsModal;
+        
+        if (this.settingsOverlayClickHandler) {
+            modal.removeEventListener('click', this.settingsOverlayClickHandler);
+            this.settingsOverlayClickHandler = null;
+        }
+        
+        if (this.settingsEscapeHandler) {
+            document.removeEventListener('keydown', this.settingsEscapeHandler);
+            this.settingsEscapeHandler = null;
+        }
+    },
+
     handleModalClose(e) {
         const modal = e.target.closest('.modal-overlay');
         if (modal && modal.id === 'mainSettingsModal') {
             // If settings modal is being closed without saving, revert theme
             if (this.originalTheme && document.body.dataset.theme !== this.originalTheme) {
                 document.body.dataset.theme = this.originalTheme;
+                
+                // Also update the dropdown to reflect the reverted theme
+                const themeDropdown = document.querySelector('[data-original-id="settingsTheme"]');
+                if (themeDropdown) {
+                    window.UI.elements.settingsTheme.value = this.originalTheme;
+                    window.Dropdown.updateFromSelect(themeDropdown, window.UI.elements.settingsTheme);
+                }
             }
+            
+            // Clean up event handlers
+            this.removeSettingsModalHandlers();
         }
         window.UI.closeAllModals();
     }
