@@ -621,14 +621,8 @@ form button[type="submit"] {
 .celebration-icon {
     font-size: 4rem;
     margin-bottom: 1rem;
-    animation: celebrate 1s ease-in-out;
 }
 
-@keyframes celebrate {
-    0% { transform: scale(0) rotate(0deg); }
-    50% { transform: scale(1.2) rotate(180deg); }
-    100% { transform: scale(1) rotate(360deg); }
-}
 
 .workout-complete-modal .custom-modal-header {
     border-bottom: none;
