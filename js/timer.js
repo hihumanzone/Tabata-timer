@@ -143,6 +143,9 @@ export const Timer = {
             State.timer.state = 'stopped';
             window.UI.hide(window.UI.elements.timerScreen);
             window.UI.show(window.UI.elements.homeScreen);
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
         }
     },
 
@@ -157,6 +160,9 @@ export const Timer = {
         State.timer.state = 'stopped';
         window.UI.hide(window.UI.elements.timerScreen);
         window.UI.show(window.UI.elements.homeScreen);
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
     },
 
     formatTime(seconds) {
