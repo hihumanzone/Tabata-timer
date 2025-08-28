@@ -12,7 +12,7 @@ export const EventListeners = {
         window.UI.elements.newWorkoutBtn.addEventListener('click', () => window.UI.openEditor());
         window.UI.elements.importWorkoutBtn.addEventListener('click', () => window.UI.elements.importWorkoutFileInput.click());
         window.UI.elements.importWorkoutFileInput.addEventListener('change', this.handleImportWorkoutFile);
-        window.UI.elements.mainSettingsBtn.addEventListener('click', this.openMainSettings);
+        window.UI.elements.mainSettingsBtn.addEventListener('click', this.openMainSettings.bind(this));
         window.UI.elements.searchBar.addEventListener('input', () => window.UI.renderWorkouts());
         window.UI.elements.sortSelect.addEventListener('change', () => window.UI.renderWorkouts());
 
@@ -24,9 +24,7 @@ export const EventListeners = {
         window.UI.elements.addWorkStepBtn.addEventListener('click', () => window.UI.addStepToEditor('work'));
         window.UI.elements.addRestStepBtn.addEventListener('click', () => window.UI.addStepToEditor('rest'));
         
-        window.UI.elements.mainSettingsForm.addEventListener('submit', this.handleSaveSettings);
-        
-        // Theme preview functionality
+        window.UI.elements.mainSettingsForm.addEventListener('submit', this.handleSaveSettings.bind(this));
         window.UI.elements.settingsTheme.addEventListener('change', this.handleThemePreview.bind(this));
         
         document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', (e) => this.handleModalClose(e)));
@@ -216,14 +214,12 @@ export const EventListeners = {
     },
 
     openMainSettings() {
-        // Store the original theme for potential revert
         this.originalTheme = State.settings.theme;
         
         window.UI.elements.settingsUsername.value = State.settings.username;
         window.UI.elements.settingsTheme.value = State.settings.theme;
         window.UI.elements.settingsView.value = State.settings.view;
         
-        // Update dropdown displays to match select element values
         const themeDropdown = document.querySelector('[data-original-id="settingsTheme"]');
         const viewDropdown = document.querySelector('[data-original-id="settingsView"]');
         
@@ -235,6 +231,7 @@ export const EventListeners = {
         }
         
         window.UI.show(window.UI.elements.mainSettingsModal);
+        this.addSettingsModalHandlers();
     },
 
     handleSaveSettings(e) {
@@ -246,9 +243,8 @@ export const EventListeners = {
         window.UI.applySettings();
         window.UI.renderWorkouts();
         
-        // Clear original theme since settings were saved
         this.originalTheme = null;
-        
+        this.removeSettingsModalHandlers();
         window.UI.closeAllModals();
     },
     
@@ -263,17 +259,57 @@ export const EventListeners = {
     },
 
     handleThemePreview(e) {
-        // Apply theme instantly for preview
         document.body.dataset.theme = e.target.value;
+    },
+
+    addSettingsModalHandlers() {
+        const modal = window.UI.elements.mainSettingsModal;
+        this.removeSettingsModalHandlers();
+        
+        this.settingsOverlayClickHandler = (e) => {
+            if (e.target === modal) {
+                this.handleModalClose(e);
+            }
+        };
+        
+        this.settingsEscapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                this.handleModalClose(e);
+            }
+        };
+        
+        modal.addEventListener('click', this.settingsOverlayClickHandler);
+        document.addEventListener('keydown', this.settingsEscapeHandler);
+    },
+
+    removeSettingsModalHandlers() {
+        const modal = window.UI.elements.mainSettingsModal;
+        
+        if (this.settingsOverlayClickHandler) {
+            modal.removeEventListener('click', this.settingsOverlayClickHandler);
+            this.settingsOverlayClickHandler = null;
+        }
+        
+        if (this.settingsEscapeHandler) {
+            document.removeEventListener('keydown', this.settingsEscapeHandler);
+            this.settingsEscapeHandler = null;
+        }
     },
 
     handleModalClose(e) {
         const modal = e.target.closest('.modal-overlay');
         if (modal && modal.id === 'mainSettingsModal') {
-            // If settings modal is being closed without saving, revert theme
             if (this.originalTheme && document.body.dataset.theme !== this.originalTheme) {
                 document.body.dataset.theme = this.originalTheme;
+                
+                const themeDropdown = document.querySelector('[data-original-id="settingsTheme"]');
+                if (themeDropdown) {
+                    window.UI.elements.settingsTheme.value = this.originalTheme;
+                    window.Dropdown.updateFromSelect(themeDropdown, window.UI.elements.settingsTheme);
+                }
             }
+            
+            this.removeSettingsModalHandlers();
         }
         window.UI.closeAllModals();
     }
