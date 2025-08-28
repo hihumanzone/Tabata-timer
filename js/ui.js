@@ -64,6 +64,9 @@ export const UI = {
         this.elements.workoutForm.reset();
         this.elements.stepsList.innerHTML = '';
         this.buildColorSelector();
+        
+        // Enhance media inputs if not already done
+        this.enhanceMediaInputs();
 
         if (workout) {
             this.elements.editorTitle.textContent = 'Edit Workout';
@@ -93,6 +96,37 @@ export const UI = {
         this.show(this.elements.editorScreen);
     },
 
+    enhanceMediaInputs() {
+        // Check if already enhanced
+        if (this.elements.prepareMedia.parentNode.classList.contains('media-input-wrapper')) {
+            return;
+        }
+        
+        // Enhance prepare media input
+        const prepareGroup = this.elements.prepareMedia.parentNode;
+        const prepareLabel = prepareGroup.querySelector('label');
+        prepareLabel.textContent = 'Prepare Media (Image/Video/Audio, Optional)';
+        
+        const prepareValue = this.elements.prepareMedia.value;
+        this.elements.prepareMedia.remove();
+        
+        const { urlInput: prepareInput } = window.FileManager.createMediaInput(prepareGroup, prepareValue);
+        prepareInput.id = 'prepareMedia';
+        this.elements.prepareMedia = prepareInput;
+        
+        // Enhance cooldown media input
+        const cooldownGroup = this.elements.cooldownMedia.parentNode;
+        const cooldownLabel = cooldownGroup.querySelector('label');
+        cooldownLabel.textContent = 'Cooldown Media (Image/Video/Audio, Optional)';
+        
+        const cooldownValue = this.elements.cooldownMedia.value;
+        this.elements.cooldownMedia.remove();
+        
+        const { urlInput: cooldownInput } = window.FileManager.createMediaInput(cooldownGroup, cooldownValue);
+        cooldownInput.id = 'cooldownMedia';
+        this.elements.cooldownMedia = cooldownInput;
+    },
+
     closeEditor() {
         this.hide(this.elements.editorScreen);
         this.show(this.elements.homeScreen);
@@ -110,7 +144,23 @@ export const UI = {
         stepEl.querySelector('.step-description').value = data.description || '';
         stepEl.querySelector('.step-duration').value = data.duration !== undefined ? data.duration : (type === 'work' ? 30 : 15);
         stepEl.querySelector('.step-reps').value = data.reps || '';
-        stepEl.querySelector('.step-media').value = data.media || '';
+        
+        // Replace the simple media input with enhanced file upload
+        const mediaGroup = stepEl.querySelector('.form-group:last-child');
+        const mediaLabel = mediaGroup.querySelector('label');
+        mediaLabel.textContent = 'Media (Image/Video/Audio, Optional)';
+        
+        // Remove the original input
+        const originalInput = mediaGroup.querySelector('.step-media');
+        originalInput.remove();
+        
+        // Create enhanced media input with file upload
+        const { wrapper, urlInput } = window.FileManager.createMediaInput(mediaGroup, data.media, (fileData) => {
+            console.log('Media file selected:', fileData.name);
+        });
+        
+        // Ensure the input has the correct class for form handling
+        urlInput.classList.add('step-media');
 
         this.elements.stepsList.appendChild(stepEl);
         
@@ -207,5 +257,36 @@ export const UI = {
         }
         
         document.querySelectorAll('.modal-overlay').forEach(modal => this.hide(modal));
+    },
+
+    enhanceMediaInputs() {
+        // Check if already enhanced
+        if (this.elements.prepareMedia.parentNode.classList.contains('media-input-wrapper')) {
+            return;
+        }
+        
+        // Enhance prepare media input
+        const prepareGroup = this.elements.prepareMedia.parentNode;
+        const prepareLabel = prepareGroup.querySelector('label');
+        prepareLabel.textContent = 'Prepare Media (Image/Video/Audio, Optional)';
+        
+        const prepareValue = this.elements.prepareMedia.value;
+        this.elements.prepareMedia.remove();
+        
+        const { urlInput: prepareInput } = window.FileManager.createMediaInput(prepareGroup, prepareValue);
+        prepareInput.id = 'prepareMedia';
+        this.elements.prepareMedia = prepareInput;
+        
+        // Enhance cooldown media input
+        const cooldownGroup = this.elements.cooldownMedia.parentNode;
+        const cooldownLabel = cooldownGroup.querySelector('label');
+        cooldownLabel.textContent = 'Cooldown Media (Image/Video/Audio, Optional)';
+        
+        const cooldownValue = this.elements.cooldownMedia.value;
+        this.elements.cooldownMedia.remove();
+        
+        const { urlInput: cooldownInput } = window.FileManager.createMediaInput(cooldownGroup, cooldownValue);
+        cooldownInput.id = 'cooldownMedia';
+        this.elements.cooldownMedia = cooldownInput;
     }
 };

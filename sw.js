@@ -1,6 +1,6 @@
-const CACHE_NAME = 'tabata-timer-v1';
-const STATIC_CACHE_NAME = 'tabata-static-v1';
-const DYNAMIC_CACHE_NAME = 'tabata-dynamic-v1';
+const CACHE_NAME = 'tabata-timer-v2';
+const STATIC_CACHE_NAME = 'tabata-static-v2';
+const DYNAMIC_CACHE_NAME = 'tabata-dynamic-v2';
 
 // Static assets to cache immediately
 const STATIC_ASSETS = [
