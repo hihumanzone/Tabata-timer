@@ -871,7 +871,6 @@ form button[type="submit"] {
     transition: background-color 0.15s ease;
     color: var(--text-primary);
     border-bottom: 1px solid var(--bg-tertiary);
-    /* Comprehensive prevention of mobile tap highlighting */
     -webkit-tap-highlight-color: transparent !important;
     -webkit-touch-callout: none !important;
     -webkit-user-select: none !important;
@@ -880,7 +879,6 @@ form button[type="submit"] {
     user-select: none !important;
     outline: none !important;
     background: transparent !important;
-    /* Prevent any browser default highlighting */
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -899,7 +897,6 @@ form button[type="submit"] {
     background: transparent !important;
     color: var(--accent-primary);
     outline: none !important;
-    /* Additional mobile browser tap highlight prevention */
     -webkit-tap-highlight-color: transparent !important;
     -webkit-touch-callout: none !important;
     -webkit-user-select: none !important;

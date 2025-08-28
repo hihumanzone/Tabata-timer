@@ -25,8 +25,6 @@ export const EventListeners = {
         window.UI.elements.addRestStepBtn.addEventListener('click', () => window.UI.addStepToEditor('rest'));
         
         window.UI.elements.mainSettingsForm.addEventListener('submit', this.handleSaveSettings.bind(this));
-        
-        // Theme preview functionality
         window.UI.elements.settingsTheme.addEventListener('change', this.handleThemePreview.bind(this));
         
         document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', (e) => this.handleModalClose(e)));
@@ -216,14 +214,12 @@ export const EventListeners = {
     },
 
     openMainSettings() {
-        // Store the original theme for potential revert
         this.originalTheme = State.settings.theme;
         
         window.UI.elements.settingsUsername.value = State.settings.username;
         window.UI.elements.settingsTheme.value = State.settings.theme;
         window.UI.elements.settingsView.value = State.settings.view;
         
-        // Update dropdown displays to match select element values
         const themeDropdown = document.querySelector('[data-original-id="settingsTheme"]');
         const viewDropdown = document.querySelector('[data-original-id="settingsView"]');
         
@@ -235,8 +231,6 @@ export const EventListeners = {
         }
         
         window.UI.show(window.UI.elements.mainSettingsModal);
-        
-        // Add overlay click and escape key handlers for settings modal
         this.addSettingsModalHandlers();
     },
 
@@ -249,12 +243,8 @@ export const EventListeners = {
         window.UI.applySettings();
         window.UI.renderWorkouts();
         
-        // Clear original theme since settings were saved
         this.originalTheme = null;
-        
-        // Clean up event handlers
         this.removeSettingsModalHandlers();
-        
         window.UI.closeAllModals();
     },
     
@@ -269,24 +259,19 @@ export const EventListeners = {
     },
 
     handleThemePreview(e) {
-        // Apply theme instantly for preview
         document.body.dataset.theme = e.target.value;
     },
 
     addSettingsModalHandlers() {
         const modal = window.UI.elements.mainSettingsModal;
-        
-        // Remove any existing handlers to prevent duplicates
         this.removeSettingsModalHandlers();
         
-        // Overlay click handler
         this.settingsOverlayClickHandler = (e) => {
             if (e.target === modal) {
                 this.handleModalClose(e);
             }
         };
         
-        // Escape key handler
         this.settingsEscapeHandler = (e) => {
             if (e.key === 'Escape') {
                 this.handleModalClose(e);
@@ -314,11 +299,9 @@ export const EventListeners = {
     handleModalClose(e) {
         const modal = e.target.closest('.modal-overlay');
         if (modal && modal.id === 'mainSettingsModal') {
-            // If settings modal is being closed without saving, revert theme
             if (this.originalTheme && document.body.dataset.theme !== this.originalTheme) {
                 document.body.dataset.theme = this.originalTheme;
                 
-                // Also update the dropdown to reflect the reverted theme
                 const themeDropdown = document.querySelector('[data-original-id="settingsTheme"]');
                 if (themeDropdown) {
                     window.UI.elements.settingsTheme.value = this.originalTheme;
@@ -326,7 +309,6 @@ export const EventListeners = {
                 }
             }
             
-            // Clean up event handlers
             this.removeSettingsModalHandlers();
         }
         window.UI.closeAllModals();
