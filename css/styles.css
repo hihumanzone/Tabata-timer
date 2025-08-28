@@ -937,3 +937,92 @@ form button[type="submit"] {
         max-width: none;
     }
 }
+
+/* Workout Progress Modal */
+.workout-progress-modal .custom-modal-content {
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.workout-progress-content .current-step-info {
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.workout-progress-content .current-step-info h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--accent-primary);
+}
+
+.workout-progress-content .step-counter {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.workout-progress-content .full-sequence h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+}
+
+.sequence-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sequence-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    gap: 0.75rem;
+}
+
+.sequence-item.completed {
+    background: rgba(var(--success-rgb), 0.1);
+    border-color: var(--success-color);
+}
+
+.sequence-item.active {
+    background: rgba(var(--accent-primary-rgb), 0.1);
+    border-color: var(--accent-primary);
+    font-weight: bold;
+}
+
+.sequence-item.pending {
+    background: var(--background-color);
+    opacity: 0.7;
+}
+
+.step-icon {
+    width: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.sequence-item.completed .step-icon {
+    color: var(--success-color);
+}
+
+.sequence-item.active .step-icon {
+    color: var(--accent-primary);
+}
+
+.step-name {
+    flex: 1;
+}
+
+.step-duration {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: normal;
+}

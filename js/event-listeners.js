@@ -37,6 +37,7 @@ export const EventListeners = {
         window.UI.elements.timerDoneBtn.addEventListener('click', () => window.Timer.runNextStep());
         window.UI.elements.timerSkipBtn.addEventListener('click', () => window.Timer.skip());
         window.UI.elements.timerPrevBtn.addEventListener('click', () => window.Timer.prev());
+        window.UI.elements.timerProgressBtn.addEventListener('click', () => window.Modal.showWorkoutProgress());
         window.UI.elements.timerFullscreenBtn.addEventListener('click', this.handleFullscreenToggle);
         document.addEventListener('fullscreenchange', () => window.UI.updateFullscreenButton());
     },
