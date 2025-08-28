@@ -1020,3 +1020,202 @@ form button[type="submit"] {
     color: var(--text-secondary);
     font-weight: normal;
 }
+
+/* --- PWA Specific Styles --- */
+/* Install Button */
+.install-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--accent-primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.install-button:hover {
+    background-color: color-mix(in srgb, var(--accent-primary), #000 10%);
+}
+
+.install-button:active {
+    transform: scale(0.98);
+}
+
+.install-button svg {
+    flex-shrink: 0;
+}
+
+/* Offline Indicator */
+.offline-indicator {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--danger-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    z-index: 1150;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideDown 0.3s ease-out;
+}
+
+.offline-indicator svg {
+    flex-shrink: 0;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateX(-50%) translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Media Input Wrapper for Enhanced File Upload */
+.media-input-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+.media-input-wrapper .step-media {
+    flex: 1;
+    margin: 0;
+}
+
+.select-file-btn {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.select-file-btn:hover {
+    background-color: var(--border-color);
+}
+
+/* PWA Standalone Mode Adjustments */
+@media (display-mode: standalone) {
+    body {
+        /* Remove default margins that might appear in standalone mode */
+        margin: 0;
+        padding: 0;
+        /* Handle safe areas for devices with notches */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    
+    .home-header {
+        /* Add extra padding in standalone mode */
+        padding-top: 0.5rem;
+    }
+    
+    /* Hide install button when running as PWA */
+    .install-button {
+        display: none !important;
+    }
+}
+
+/* iOS Safari Standalone Mode */
+@media (display-mode: standalone) and (-webkit-touch-callout: none) {
+    /* iOS specific adjustments */
+    #timerScreen {
+        /* Ensure full screen usage on iOS */
+        height: 100vh;
+        height: var(--vh-dynamic, 100vh);
+    }
+}
+
+/* Dark mode specific PWA adjustments */
+body[data-theme="dark"] .offline-indicator {
+    background-color: #ff453a;
+}
+
+body[data-theme="high-contrast"] .offline-indicator {
+    background-color: #ff453a;
+    border: 1px solid #ffffff;
+}
+
+/* Enhanced file input states */
+.media-input-wrapper .step-media[data-is-local="true"] {
+    border-left: 3px solid var(--color-green);
+    padding-left: 0.7rem;
+}
+
+.media-input-wrapper .step-media[data-is-local="true"]::placeholder {
+    color: var(--color-green);
+}
+
+/* Cache size indicator (for settings/debug) */
+.cache-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background-color: var(--bg-tertiary);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.cache-info svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* Progressive enhancement indicators */
+.feature-available {
+    color: var(--color-green);
+}
+
+.feature-unavailable {
+    color: var(--text-secondary);
+}
+
+/* Small screen adjustments for PWA */
+@media (max-width: 480px) {
+    .install-button {
+        font-size: 0.8rem;
+        padding: 0.6rem 0.8rem;
+    }
+    
+    .media-input-wrapper {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .select-file-btn {
+        font-size: 0.8rem;
+        padding: 0.5rem;
+    }
+    
+    .offline-indicator {
+        left: 1rem;
+        right: 1rem;
+        transform: none;
+        font-size: 0.8rem;
+    }
+}

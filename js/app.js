@@ -10,6 +10,8 @@ import { Modal } from './modal.js';
 import { Notifications } from './notifications.js';
 import { Dropdown } from './dropdown.js';
 import { Audio } from './audio.js';
+import { PWAManager } from './pwa-manager.js';
+import { FileManager } from './file-manager.js';
 
 /**
  * Main application entry point.
@@ -29,6 +31,8 @@ export const App = {
         window.Notifications = Notifications;
         window.Dropdown = Dropdown;
         window.Audio = Audio;
+        window.PWAManager = PWAManager;
+        window.FileManager = FileManager;
 
         ViewportManager.init();
         UI.cacheDOMElements();
@@ -39,6 +43,10 @@ export const App = {
         Notifications.init();
         Dropdown.replaceAll();
         Audio.init();
+        
+        // Initialize PWA features
+        PWAManager.init();
+        FileManager.init();
 
         if (!State.settings.username) {
             UI.show(UI.elements.setupScreen);
