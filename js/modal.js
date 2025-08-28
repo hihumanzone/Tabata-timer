@@ -1,3 +1,5 @@
+import { State } from './state.js';
+
 /**
  * Custom modal system for confirmations and dialogs
  * Replaces native browser confirm() and alert() functions
@@ -251,6 +253,136 @@ export const Modal = {
             // Focus the confirm button
             setTimeout(() => {
                 confirmBtn.focus();
+            }, 100);
+
+            // Add show animation
+            requestAnimationFrame(() => {
+                modal.classList.add('show');
+            });
+        });
+    },
+
+    /**
+     * Show workout progress modal with current step and full sequence
+     * @returns {Promise<boolean>} - true when closed
+     */
+    showWorkoutProgress() {
+        return new Promise((resolve) => {
+            if (!State.timer.currentWorkout || !State.timer.executionQueue) {
+                resolve(false);
+                return;
+            }
+
+            const workout = State.timer.currentWorkout;
+            const queue = State.timer.executionQueue;
+            const currentIndex = State.timer.currentIndex;
+
+            // Build the progress display
+            let progressHTML = '<div class="workout-progress-content">';
+            
+            // Current step info
+            progressHTML += `<div class="current-step-info">`;
+            progressHTML += `<h3>Current Progress</h3>`;
+            progressHTML += `<p class="step-counter">Step ${currentIndex + 1} of ${queue.length}</p>`;
+            progressHTML += `</div>`;
+
+            // Full sequence
+            progressHTML += `<div class="full-sequence">`;
+            progressHTML += `<h4>Workout Sequence</h4>`;
+            progressHTML += `<ol class="sequence-list">`;
+
+            queue.forEach((event, index) => {
+                const isActive = index === currentIndex;
+                const isCompleted = index < currentIndex;
+                let stepName = '';
+                let stepDuration = '';
+
+                switch(event.type) {
+                    case 'prepare':
+                        stepName = `Prepare - ${workout.title}`;
+                        stepDuration = `${workout.prepare}s`;
+                        break;
+                    case 'cooldown':
+                        stepName = `Cooldown - ${workout.title}`;
+                        stepDuration = `${workout.cooldown}s`;
+                        break;
+                    case 'step':
+                        const step = workout.steps[event.stepIndex];
+                        stepName = `${step.type} - ${step.name}`;
+                        stepDuration = step.duration > 0 ? `${step.duration}s` : 'Manual';
+                        if (event.set) {
+                            stepName = `Set ${event.set}: ${stepName}`;
+                        }
+                        break;
+                }
+
+                const statusClass = isCompleted ? 'completed' : (isActive ? 'active' : 'pending');
+                const statusIcon = isCompleted ? '✓' : (isActive ? '▶' : '○');
+                
+                progressHTML += `<li class="sequence-item ${statusClass}">`;
+                progressHTML += `<span class="step-icon">${statusIcon}</span>`;
+                progressHTML += `<span class="step-name">${stepName}</span>`;
+                progressHTML += `<span class="step-duration">${stepDuration}</span>`;
+                progressHTML += `</li>`;
+            });
+
+            progressHTML += `</ol>`;
+            progressHTML += `</div>`;
+            progressHTML += `</div>`;
+
+            // Create modal HTML
+            const modalHTML = `
+                <div class="custom-modal-overlay workout-progress-modal" role="dialog" aria-modal="true" aria-labelledby="progress-title">
+                    <div class="custom-modal-content">
+                        <div class="custom-modal-header">
+                            <h2 id="progress-title">Workout Progress</h2>
+                        </div>
+                        <div class="custom-modal-body">
+                            ${progressHTML}
+                        </div>
+                        <div class="custom-modal-actions">
+                            <button class="custom-modal-confirm primary">Close</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Create modal element
+            const modalElement = document.createElement('div');
+            modalElement.innerHTML = modalHTML;
+            const modal = modalElement.firstElementChild;
+
+            // Store for focus management
+            this.previousFocus = document.activeElement;
+            this.activeModal = modal;
+
+            // Add to DOM
+            document.body.appendChild(modal);
+
+            // Set up event listeners
+            const closeBtn = modal.querySelector('.custom-modal-confirm');
+
+            const handleClose = () => {
+                this.hide(modal);
+                resolve(true);
+            };
+
+            closeBtn.addEventListener('click', handleClose);
+
+            // Handle keyboard navigation
+            modal.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' || e.key === 'Enter') {
+                    e.preventDefault();
+                    handleClose();
+                }
+            });
+
+            // Set up focus trap
+            this.setupFocusTrap(modal);
+
+            // Focus the close button
+            setTimeout(() => {
+                closeBtn.focus();
             }, 100);
 
             // Add show animation

@@ -9,6 +9,7 @@ import { EventListeners } from './event-listeners.js';
 import { Modal } from './modal.js';
 import { Notifications } from './notifications.js';
 import { Dropdown } from './dropdown.js';
+import { Audio } from './audio.js';
 
 /**
  * Main application entry point.
@@ -27,6 +28,7 @@ export const App = {
         window.Modal = Modal;
         window.Notifications = Notifications;
         window.Dropdown = Dropdown;
+        window.Audio = Audio;
 
         ViewportManager.init();
         UI.cacheDOMElements();
@@ -36,6 +38,7 @@ export const App = {
         // Initialize custom components
         Notifications.init();
         Dropdown.replaceAll();
+        Audio.init();
 
         if (!State.settings.username) {
             UI.show(UI.elements.setupScreen);

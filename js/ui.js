@@ -18,7 +18,7 @@ export const UI = {
             'addWorkStepBtn', 'addRestStepBtn', 'timerCurrentCategory', 'timerCurrentName',
             'timerMediaContainer', 'timerCountdown', 'timerReps', 'timerDescription', 'timerDoneBtn',
             'timerStepProgress', 'timerOverallProgress', 'timerOverallProgressBar', 'timerPauseResumeBtn',
-            'timerQuitBtn', 'timerPrevBtn', 'timerSkipBtn', 'timerFullscreenBtn',
+            'timerQuitBtn', 'timerPrevBtn', 'timerSkipBtn', 'timerProgressBtn', 'timerFullscreenBtn',
             'mainSettingsModal', 'mainSettingsForm', 'settingsUsername', 'settingsTheme',
             'settingsView', 'exportUserDataBtn', 'importUserDataBtn', 'previewModal',
             'previewTitle', 'previewContent'

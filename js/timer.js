@@ -76,6 +76,11 @@ export const Timer = {
         State.timer.timeLeft = data.duration;
         window.UI.updateTimerUI({ ...data, set: currentEvent.set, stepIndex: currentEvent.stepIndex });
         
+        // Play task start sound for new exercises (but not for the very first prepare step)
+        if (State.timer.currentIndex > 0) {
+            window.Audio.playTaskStartSound();
+        }
+        
         if (data.duration > 0) {
             window.UI.hide(window.UI.elements.timerDoneBtn);
             State.timer.interval = setInterval(() => this.tick(), 1000);
@@ -87,6 +92,12 @@ export const Timer = {
     tick() {
         State.timer.timeLeft--;
         window.UI.elements.timerCountdown.textContent = this.formatTime(State.timer.timeLeft);
+        
+        // Play countdown beeps for final 3 seconds
+        if (State.timer.timeLeft <= 3 && State.timer.timeLeft > 0) {
+            window.Audio.playCountdownBeep();
+        }
+        
         if (State.timer.timeLeft <= 0) {
             this.runNextStep();
         }
