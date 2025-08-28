@@ -121,23 +121,5 @@ export const ViewportManager = {
                 }
             }, 500);
         }
-    },
-
-    logViewportInfo() {
-        const info = {
-            browser: this.isChrome ? 'Chrome' : 'Other',
-            windowInnerHeight: window.innerHeight,
-            documentClientHeight: document.documentElement.clientHeight,
-            zoomLevel: this.getZoomLevel(),
-            orientation: window.innerWidth > window.innerHeight ? 'landscape' : 'portrait',
-            vhDynamic: getComputedStyle(document.documentElement).getPropertyValue('--vh-dynamic'),
-            supports100svh: CSS.supports('height', '100svh'),
-            supports100lvh: CSS.supports('height', '100lvh'),
-            visualViewportHeight: window.visualViewport ? window.visualViewport.height : 'N/A',
-            safeAreaTop: getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top, 0px)') || '0px',
-            safeAreaBottom: getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom, 0px)') || '0px'
-        };
-        console.log('ViewportManager Debug Info:', info);
-        return info;
     }
 };
