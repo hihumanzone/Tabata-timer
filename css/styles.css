@@ -871,13 +871,19 @@ form button[type="submit"] {
     transition: background-color 0.15s ease;
     color: var(--text-primary);
     border-bottom: 1px solid var(--bg-tertiary);
-    /* Prevent blue tap highlighting on mobile */
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    /* Comprehensive prevention of mobile tap highlighting */
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    outline: none !important;
+    background: transparent !important;
+    /* Prevent any browser default highlighting */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 .custom-dropdown-option:last-child {
@@ -885,26 +891,39 @@ form button[type="submit"] {
 }
 
 .custom-dropdown-option:hover,
-.custom-dropdown-option.focused {
-    background-color: transparent !important;
-    color: var(--accent-primary);
-}
-
+.custom-dropdown-option.focused,
+.custom-dropdown-option:focus,
+.custom-dropdown-option:focus-visible,
 .custom-dropdown-option:active {
     background-color: transparent !important;
+    background: transparent !important;
     color: var(--accent-primary);
+    outline: none !important;
+    /* Additional mobile browser tap highlight prevention */
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
 }
 
 .custom-dropdown-option[aria-selected="true"] {
     color: var(--accent-primary);
     font-weight: 500;
+    background-color: transparent !important;
+    background: transparent !important;
 }
 
 .custom-dropdown-option[aria-selected="true"]:hover,
 .custom-dropdown-option[aria-selected="true"].focused,
+.custom-dropdown-option[aria-selected="true"]:focus,
+.custom-dropdown-option[aria-selected="true"]:focus-visible,
 .custom-dropdown-option[aria-selected="true"]:active {
     background-color: transparent !important;
+    background: transparent !important;
     color: var(--accent-primary);
+    outline: none !important;
 }
 
 /* Mobile responsiveness for notifications */
