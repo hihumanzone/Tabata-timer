@@ -257,7 +257,7 @@ export const Modal = {
 
             // Add show animation
             requestAnimationFrame(() => {
-                modal.classList.add('show');
+                modal.classList.add('visible');
             });
         });
     },
@@ -387,7 +387,7 @@ export const Modal = {
 
             // Add show animation
             requestAnimationFrame(() => {
-                modal.classList.add('show');
+                modal.classList.add('visible');
             });
         });
     }
