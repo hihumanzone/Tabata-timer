@@ -123,6 +123,19 @@ button.secondary:hover:not(:disabled) {
 button.danger { background-color: var(--danger-color); border-color: transparent; color: white; }
 button.danger:hover { background-color: color-mix(in srgb, var(--danger-color), #000 10%); }
 
+button[aria-label] > svg,
+.card-favorite-btn,
+.card-settings-btn,
+.step-controls button,
+.modal-close-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .settings-icon {
     display: inline-block;
     vertical-align: middle;
@@ -707,6 +720,91 @@ form button[type="submit"] {
 .workout-progress-modal .custom-modal-content {
     max-width: 600px;
     max-height: 80vh;
+}
+
+.workout-progress-content .current-step-info {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.workout-progress-content .current-step-info h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--accent-primary);
+    font-weight: 600;
+}
+
+.workout-progress-content .step-counter {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.workout-progress-content .full-sequence h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.sequence-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sequence-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    gap: 0.75rem;
+    transition: background-color 0.2s;
+}
+
+.sequence-item.completed {
+    background: color-mix(in srgb, var(--success-color) 15%, transparent);
+    border-color: var(--success-color);
+}
+
+.sequence-item.active {
+    background: color-mix(in srgb, var(--accent-primary) 15%, transparent);
+    border-color: var(--accent-primary);
+    font-weight: 600;
+}
+
+.sequence-item.pending {
+    background: var(--bg-tertiary);
+    opacity: 0.7;
+}
+
+.step-icon {
+    width: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.sequence-item.completed .step-icon {
+    color: var(--success-color);
+}
+
+.sequence-item.active .step-icon {
+    color: var(--accent-primary);
+}
+
+.step-name {
+    flex: 1;
+}
+
+.step-duration {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: normal;
 }
 
 /* --- Custom Dropdown Component --- */
