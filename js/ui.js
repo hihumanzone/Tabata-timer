@@ -6,6 +6,7 @@ import { Config } from './config.js';
  */
 export const UI = {
     elements: {},
+    _lastMediaBlobUrl: null,
 
     cacheDOMElements() {
         const ids = [
@@ -150,15 +151,40 @@ export const UI = {
         if (data.reps > 0) this.elements.timerReps.textContent = `${data.reps} Reps`;
 
         const mediaContainer = this.elements.timerMediaContainer;
-        if (data.media?.trim()) {
+        const media = data.media?.trim();
+        if (media) {
             this.show(mediaContainer);
             mediaContainer.innerHTML = '';
-            if (/\.(jpg|jpeg|png|gif|webp)$/i.test(data.media)) {
-                mediaContainer.innerHTML = `<img src="${data.media}" alt="${data.name}">`;
-            } else if (/\.(mp4|webm|ogv)$/i.test(data.media)) {
-                mediaContainer.innerHTML = `<video src="${data.media}" autoplay muted loop playsinline></video>`;
+            const setMedia = (url, mimeType = '') => {
+                if (this._lastMediaBlobUrl && this._lastMediaBlobUrl !== url) {
+                    try { URL.revokeObjectURL(this._lastMediaBlobUrl); } catch {}
+                    this._lastMediaBlobUrl = null;
+                }
+                const isVideo = mimeType ? mimeType.startsWith('video/') : /\.(mp4|webm|ogv)$/i.test(url);
+                const isImage = mimeType ? mimeType.startsWith('image/') : /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+                if (isImage) {
+                    mediaContainer.innerHTML = `<img src="${url}" alt="${data.name}">`;
+                } else if (isVideo) {
+                    mediaContainer.innerHTML = `<video src="${url}" autoplay muted loop playsinline></video>`;
+                } else {
+                    mediaContainer.innerHTML = `<img src="${url}" alt="${data.name}">`;
+                }
+                if (url.startsWith('blob:')) this._lastMediaBlobUrl = url;
+            };
+            if (media.startsWith('ms://')) {
+                const id = window.MediaStore.parseId(media);
+                window.MediaStore.getFile(id).then((rec) => {
+                    if (!rec) return;
+                    window.MediaStore.toObjectURL(media).then((url) => setMedia(url, rec.type));
+                });
+            } else {
+                setMedia(media);
             }
         } else {
+            if (this._lastMediaBlobUrl) {
+                try { URL.revokeObjectURL(this._lastMediaBlobUrl); } catch {}
+                this._lastMediaBlobUrl = null;
+            }
             this.hide(mediaContainer);
         }
         

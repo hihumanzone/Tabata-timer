@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customizable Tabata Timer</title>
+    <meta name="theme-color" content="#0ea5e9">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body data-theme="light">
@@ -120,7 +123,11 @@
                         </div>
                         <div class="form-group">
                             <label for="prepareMedia">Prepare Media URL (Optional)</label>
-                            <input type="text" id="prepareMedia" placeholder="Image or video URL">
+                            <div style="display:flex; gap:.5rem; align-items:center;">
+                                <input type="text" id="prepareMedia" placeholder="Image or video URL">
+                                <button type="button" class="secondary upload-media-btn" data-target-input="prepareMedia" data-action="upload-media">Upload</button>
+                                <button type="button" class="secondary clear-media-btn" data-target-input="prepareMedia" data-action="clear-media">Clear</button>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="workoutSets">Sets</label>
@@ -132,7 +139,11 @@
                         </div>
                         <div class="form-group">
                             <label for="cooldownMedia">Cooldown Media URL (Optional)</label>
-                            <input type="text" id="cooldownMedia" placeholder="Image or video URL">
+                            <div style="display:flex; gap:.5rem; align-items:center;">
+                                <input type="text" id="cooldownMedia" placeholder="Image or video URL">
+                                <button type="button" class="secondary upload-media-btn" data-target-input="cooldownMedia" data-action="upload-media">Upload</button>
+                                <button type="button" class="secondary clear-media-btn" data-target-input="cooldownMedia" data-action="clear-media">Clear</button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -295,7 +306,11 @@
             </div>
             <div class="form-group">
                 <label>Media URL (Image/Video, Optional)</label>
-                <input type="text" class="step-media" placeholder="https://example.com/image.jpg">
+                <div style="display:flex; gap:.5rem; align-items:center;">
+                    <input type="text" class="step-media" placeholder="https://example.com/image.jpg">
+                    <button type="button" class="secondary" data-action="upload-media">Upload</button>
+                    <button type="button" class="secondary" data-action="clear-media">Clear</button>
+                </div>
             </div>
         </div>
     </template>

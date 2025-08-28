@@ -10,6 +10,7 @@ import { Modal } from './modal.js';
 import { Notifications } from './notifications.js';
 import { Dropdown } from './dropdown.js';
 import { Audio } from './audio.js';
+import { MediaStore } from './media-store.js';
 
 /**
  * Main application entry point.
@@ -29,16 +30,23 @@ export const App = {
         window.Notifications = Notifications;
         window.Dropdown = Dropdown;
         window.Audio = Audio;
+        window.MediaStore = MediaStore;
 
         ViewportManager.init();
         UI.cacheDOMElements();
         State.load();
         EventListeners.init();
         
-        // Initialize custom components
         Notifications.init();
         Dropdown.replaceAll();
         Audio.init();
+        MediaStore.init();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(console.error);
+            });
+        }
 
         if (!State.settings.username) {
             UI.show(UI.elements.setupScreen);

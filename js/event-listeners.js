@@ -17,7 +17,9 @@ export const EventListeners = {
         window.UI.elements.sortSelect.addEventListener('change', () => window.UI.renderWorkouts());
 
         window.UI.elements.workoutList.addEventListener('click', this.handleWorkoutCardAction);
-        window.UI.elements.stepsList.addEventListener('click', this.handleStepAction);
+    window.UI.elements.stepsList.addEventListener('click', this.handleStepAction);
+    window.UI.elements.stepsList.addEventListener('click', this.handleMediaButtons.bind(this));
+    window.UI.elements.editorScreen.addEventListener('click', this.handleMediaButtons.bind(this));
         
         window.UI.elements.saveWorkoutBtn.addEventListener('click', () => window.WorkoutManager.save());
         window.UI.elements.cancelEditorBtn.addEventListener('click', () => window.UI.closeEditor());
@@ -40,6 +42,53 @@ export const EventListeners = {
         window.UI.elements.timerProgressBtn.addEventListener('click', () => window.Modal.showWorkoutProgress());
         window.UI.elements.timerFullscreenBtn.addEventListener('click', this.handleFullscreenToggle);
         document.addEventListener('fullscreenchange', () => window.UI.updateFullscreenButton());
+    },
+
+    handleMediaButtons(e) {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const action = btn.dataset.action;
+        if (action !== 'upload-media' && action !== 'clear-media') return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (action === 'clear-media') {
+            const targetInputId = btn.dataset.targetInput;
+            if (targetInputId) {
+                const input = document.getElementById(targetInputId);
+                if (input) input.value = '';
+            } else {
+                const input = btn.closest('.form-group').querySelector('.step-media');
+                if (input) input.value = '';
+            }
+            return;
+        }
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*,video/*';
+        fileInput.style.display = 'none';
+        document.body.appendChild(fileInput);
+        fileInput.addEventListener('change', async () => {
+            const file = fileInput.files?.[0];
+            document.body.removeChild(fileInput);
+            if (!file) return;
+            try {
+                const msUrl = await window.MediaStore.putFile(file);
+                const targetInputId = btn.dataset.targetInput;
+                if (targetInputId) {
+                    const input = document.getElementById(targetInputId);
+                    if (input) input.value = msUrl;
+                } else {
+                    const input = btn.closest('.form-group').querySelector('.step-media');
+                    if (input) input.value = msUrl;
+                }
+                window.Notifications?.success?.('Media added. It will be available offline.');
+            } catch (err) {
+                window.Notifications?.error?.('Failed to store media.');
+            }
+        });
+        fileInput.click();
     },
 
     handleSetupSubmit(e) {
@@ -111,9 +160,6 @@ export const EventListeners = {
     },
     
     handleStepAction(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
         const target = e.target.closest('[data-action]');
         if (!target) return;
 
@@ -121,6 +167,8 @@ export const EventListeners = {
         const action = target.dataset.action;
         
         if (action === 'delete') {
+            e.preventDefault();
+            e.stopPropagation();
             stepEl.style.transform = 'scale(0.95)';
             stepEl.style.opacity = '0';
             setTimeout(() => {
@@ -131,6 +179,8 @@ export const EventListeners = {
         }
         
         if (action === 'move-up' || action === 'move-down') {
+            e.preventDefault();
+            e.stopPropagation();
             window.EventListeners.simpleStepReorder(stepEl, action);
         }
     },
