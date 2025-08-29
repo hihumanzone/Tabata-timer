@@ -28,6 +28,7 @@ export const EventListeners = {
         
         window.UI.elements.mainSettingsForm.addEventListener('submit', this.handleSaveSettings.bind(this));
         window.UI.elements.settingsTheme.addEventListener('change', this.handleThemePreview.bind(this));
+        window.UI.elements.settingsPalette.addEventListener('change', this.handleThemePreview.bind(this));
         
         document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', (e) => this.handleModalClose(e)));
         window.UI.elements.exportUserDataBtn.addEventListener('click', () => window.UserDataManager.export());
@@ -95,6 +96,7 @@ export const EventListeners = {
         e.preventDefault();
         State.settings.username = window.UI.elements.setupUsername.value.trim();
         State.settings.theme = document.querySelector('input[name="theme"]:checked').value;
+        State.settings.palette = document.querySelector('input[name="palette"]:checked').value;
         if (State.settings.username) {
             State.save();
             window.UI.applySettings();
@@ -266,16 +268,22 @@ export const EventListeners = {
 
     openMainSettings() {
         this.originalTheme = State.settings.theme;
+        this.originalPalette = State.settings.palette;
         
         window.UI.elements.settingsUsername.value = State.settings.username;
         window.UI.elements.settingsTheme.value = State.settings.theme;
+        window.UI.elements.settingsPalette.value = State.settings.palette;
         window.UI.elements.settingsView.value = State.settings.view;
         
         const themeDropdown = document.querySelector('[data-original-id="settingsTheme"]');
+        const paletteDropdown = document.querySelector('[data-original-id="settingsPalette"]');
         const viewDropdown = document.querySelector('[data-original-id="settingsView"]');
         
         if (themeDropdown) {
             window.Dropdown.updateFromSelect(themeDropdown, window.UI.elements.settingsTheme);
+        }
+        if (paletteDropdown) {
+            window.Dropdown.updateFromSelect(paletteDropdown, window.UI.elements.settingsPalette);
         }
         if (viewDropdown) {
             window.Dropdown.updateFromSelect(viewDropdown, window.UI.elements.settingsView);
@@ -289,12 +297,14 @@ export const EventListeners = {
         e.preventDefault();
         State.settings.username = window.UI.elements.settingsUsername.value.trim();
         State.settings.theme = window.UI.elements.settingsTheme.value;
+        State.settings.palette = window.UI.elements.settingsPalette.value;
         State.settings.view = window.UI.elements.settingsView.value;
         State.save();
         window.UI.applySettings();
         window.UI.renderWorkouts();
         
         this.originalTheme = null;
+        this.originalPalette = null;
         this.removeSettingsModalHandlers();
         window.UI.closeAllModals();
     },
@@ -310,7 +320,13 @@ export const EventListeners = {
     },
 
     handleThemePreview(e) {
-        document.body.dataset.theme = e.target.value;
+        const target = e.target;
+        if (target.name === 'theme' || target.id === 'settingsTheme') {
+            document.body.dataset.theme = target.value;
+        }
+        if (target.name === 'palette' || target.id === 'settingsPalette') {
+            document.body.dataset.palette = target.value;
+        }
     },
 
     addSettingsModalHandlers() {
@@ -352,12 +368,21 @@ export const EventListeners = {
         if (modal && modal.id === 'mainSettingsModal') {
             if (this.originalTheme && document.body.dataset.theme !== this.originalTheme) {
                 document.body.dataset.theme = this.originalTheme;
-                
-                const themeDropdown = document.querySelector('[data-original-id="settingsTheme"]');
-                if (themeDropdown) {
-                    window.UI.elements.settingsTheme.value = this.originalTheme;
-                    window.Dropdown.updateFromSelect(themeDropdown, window.UI.elements.settingsTheme);
-                }
+            }
+            if (this.originalPalette && document.body.dataset.palette !== this.originalPalette) {
+                document.body.dataset.palette = this.originalPalette;
+            }
+
+            // Update the dropdowns to reflect the reverted values
+            const themeDropdown = document.querySelector('[data-original-id="settingsTheme"]');
+            if (themeDropdown) {
+                window.UI.elements.settingsTheme.value = this.originalTheme;
+                window.Dropdown.updateFromSelect(themeDropdown, window.UI.elements.settingsTheme);
+            }
+            const paletteDropdown = document.querySelector('[data-original-id="settingsPalette"]');
+            if (paletteDropdown) {
+                window.UI.elements.settingsPalette.value = this.originalPalette;
+                window.Dropdown.updateFromSelect(paletteDropdown, window.UI.elements.settingsPalette);
             }
             
             this.removeSettingsModalHandlers();

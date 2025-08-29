@@ -21,12 +21,10 @@ export const Dropdown = {
             searchable = false
         } = options;
 
-        // Create dropdown structure
         const dropdown = document.createElement('div');
         dropdown.className = 'custom-dropdown';
         dropdown.setAttribute('data-original-id', selectElement.id);
 
-        // Get options from select element
         const options_ = Array.from(selectElement.options).map(option => ({
             value: option.value,
             text: option.textContent,
@@ -50,11 +48,9 @@ export const Dropdown = {
             </div>
         `;
 
-        // Replace select element
         selectElement.style.display = 'none';
         selectElement.parentNode.insertBefore(dropdown, selectElement.nextSibling);
 
-        // Set up event listeners
         this.setupEventListeners(dropdown, selectElement);
 
         return dropdown;
@@ -68,13 +64,11 @@ export const Dropdown = {
         const menu = dropdown.querySelector('.custom-dropdown-menu');
         const options = dropdown.querySelectorAll('.custom-dropdown-option');
 
-        // Toggle dropdown
         trigger.addEventListener('click', (e) => {
             e.preventDefault();
             this.toggle(dropdown);
         });
 
-        // Option selection
         options.forEach(option => {
             option.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -82,12 +76,10 @@ export const Dropdown = {
             });
         });
 
-        // Keyboard navigation
         dropdown.addEventListener('keydown', (e) => {
             this.handleKeydown(e, dropdown, selectElement);
         });
 
-        // Close on outside click
         document.addEventListener('click', (e) => {
             if (!dropdown.contains(e.target)) {
                 this.close(dropdown);
@@ -101,7 +93,6 @@ export const Dropdown = {
     toggle(dropdown) {
         const isOpen = dropdown.classList.contains('open');
         
-        // Close any other open dropdowns
         if (this.activeDropdown && this.activeDropdown !== dropdown) {
             this.close(this.activeDropdown);
         }
@@ -126,7 +117,6 @@ export const Dropdown = {
         
         this.activeDropdown = dropdown;
 
-        // Focus first option or selected option
         const selectedOption = menu.querySelector('[aria-selected="true"]');
         const firstOption = menu.querySelector('.custom-dropdown-option');
         const optionToFocus = selectedOption || firstOption;
@@ -147,7 +137,6 @@ export const Dropdown = {
         trigger.setAttribute('aria-expanded', 'false');
         menu.setAttribute('aria-hidden', 'true');
         
-        // Remove focus from options
         menu.querySelectorAll('.custom-dropdown-option').forEach(option => {
             option.classList.remove('focused');
         });
@@ -166,22 +155,18 @@ export const Dropdown = {
         const menu = dropdown.querySelector('.custom-dropdown-menu');
         const options = dropdown.querySelectorAll('.custom-dropdown-option');
 
-        // Update visual selection
         options.forEach(option => {
             const isSelected = option.dataset.value === value;
             option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
         });
 
-        // Update trigger text
         const selectedOption = Array.from(options).find(opt => opt.dataset.value === value);
         if (selectedOption) {
             text.textContent = selectedOption.textContent;
         }
 
-        // Update original select element
         selectElement.value = value;
         
-        // Trigger change event on original select
         const changeEvent = new Event('change', { bubbles: true });
         selectElement.dispatchEvent(changeEvent);
 
@@ -263,16 +248,12 @@ export const Dropdown = {
      * Set focused option in menu
      */
     setFocusedOption(menu, option) {
-        // Remove previous focus
         menu.querySelectorAll('.custom-dropdown-option').forEach(opt => {
             opt.classList.remove('focused');
         });
 
-        // Set new focus
         if (option) {
             option.classList.add('focused');
-            
-            // Scroll into view if needed
             option.scrollIntoView({ block: 'nearest' });
         }
     },
@@ -287,13 +268,11 @@ export const Dropdown = {
         
         const currentValue = selectElement.value;
         
-        // Update visual selection
         options.forEach(option => {
             const isSelected = option.dataset.value === currentValue;
             option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
         });
         
-        // Update trigger text
         const selectedOption = Array.from(options).find(opt => opt.dataset.value === currentValue);
         if (selectedOption) {
             text.textContent = selectedOption.textContent;

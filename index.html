@@ -7,9 +7,12 @@
     <meta name="theme-color" content="#0ea5e9">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body data-theme="light">
+<body data-theme="light" data-palette="default">
 
     <!-- =========== FIRST TIME SETUP SCREEN =========== -->
     <div id="setupScreen" class="modal-overlay hidden">
@@ -22,7 +25,7 @@
                     <input type="text" id="setupUsername" required>
                 </div>
                 <div class="form-group">
-                    <label>Theme</label>
+                    <label>Base Theme</label>
                     <div class="theme-options">
                         <label class="theme-option">
                             <input type="radio" name="theme" value="light" checked>
@@ -35,9 +38,34 @@
                             <span>Dark</span>
                         </label>
                         <label class="theme-option">
-                            <input type="radio" name="theme" value="high-contrast">
-                            <div class="theme-preview theme-high-contrast"></div>
+                            <input type="radio" name="theme" value="amoled">
+                            <div class="theme-preview theme-amoled"></div>
                             <span>AMOLED</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Color Palette</label>
+                    <div class="theme-options">
+                        <label class="theme-option">
+                            <input type="radio" name="palette" value="default" checked>
+                            <div class="theme-preview palette-default"></div>
+                            <span>Default</span>
+                        </label>
+                        <label class="theme-option">
+                            <input type="radio" name="palette" value="oceanic">
+                            <div class="theme-preview palette-oceanic"></div>
+                            <span>Oceanic</span>
+                        </label>
+                        <label class="theme-option">
+                            <input type="radio" name="palette" value="terra">
+                            <div class="theme-preview palette-terra"></div>
+                            <span>Terra</span>
+                        </label>
+                        <label class="theme-option">
+                            <input type="radio" name="palette" value="minty">
+                            <div class="theme-preview palette-minty"></div>
+                            <span>Minty</span>
                         </label>
                     </div>
                 </div>
@@ -55,7 +83,7 @@
                 <button id="newWorkoutBtn">New Workout</button>
                 <button class="secondary" id="importWorkoutBtn">Import Workout</button>
                 <input type="file" id="importWorkoutFileInput" class="hidden" accept=".json">
-                <button class="secondary" id="mainSettingsBtn" aria-label="Main Settings">
+                <button class="secondary btn-icon" id="mainSettingsBtn" aria-label="Main Settings">
                     <svg class="settings-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                         <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
                     </svg>
@@ -114,6 +142,8 @@
                     </div>
                 </section>
 
+                <hr class="divider">
+
                 <section class="editor-section" aria-labelledby="timing-heading">
                     <h3 id="timing-heading">Timing</h3>
                      <div class="grid-2">
@@ -148,6 +178,8 @@
                     </div>
                 </section>
                 
+                <hr class="divider">
+
                 <section class="editor-section" aria-labelledby="steps-heading">
                     <h3 id="steps-heading">Steps</h3>
                     <div id="stepsList">
@@ -184,11 +216,11 @@
                 <div id="timerOverallProgressBar"></div>
             </div>
             <div class="timer-controls">
-                <button id="timerPrevBtn" class="secondary">Previous</button>
+                <button id="timerPrevBtn" class="secondary btn-icon" aria-label="Previous Step">⏮</button>
                 <button id="timerPauseResumeBtn">Pause</button>
-                <button id="timerSkipBtn" class="secondary">Skip</button>
-                <button id="timerProgressBtn" class="secondary">Progress</button>
-                <button id="timerFullscreenBtn" class="secondary">Fullscreen ↗️</button>
+                <button id="timerSkipBtn" class="secondary btn-icon" aria-label="Next Step">⏭</button>
+                <button id="timerProgressBtn" class="secondary btn-icon" aria-label="Show Progress">📊</button>
+                <button id="timerFullscreenBtn" class="secondary btn-icon" aria-label="Toggle Fullscreen">↗️</button>
                 <button id="timerQuitBtn" class="danger">Quit</button>
             </div>
         </div>
@@ -207,11 +239,20 @@
                     <input type="text" id="settingsUsername" required>
                 </div>
                 <div class="form-group">
-                    <label for="settingsTheme">Theme</label>
+                    <label for="settingsTheme">Base Theme</label>
                     <select id="settingsTheme">
                         <option value="light">Light</option>
                         <option value="dark">Dark</option>
-                        <option value="high-contrast">AMOLED</option>
+                        <option value="amoled">AMOLED</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="settingsPalette">Color Palette</label>
+                    <select id="settingsPalette">
+                        <option value="default">Default</option>
+                        <option value="oceanic">Oceanic</option>
+                        <option value="terra">Terra</option>
+                        <option value="minty">Minty</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -223,7 +264,8 @@
                 </div>
                 <button type="submit">Save Settings</button>
             </form>
-            <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; display: flex; gap: 1rem;">
+            <hr class="divider">
+            <div style="display: flex; gap: 1rem;">
                 <button id="exportUserDataBtn" class="secondary" style="flex: 1;">Export User Data</button>
                 <button id="importUserDataBtn" class="secondary" style="flex: 1;">Import User Data</button>
             </div>
@@ -250,7 +292,7 @@
             <div class="card-main-content">
                 <div class="card-header">
                     <h3 class="card-title"></h3>
-                    <button class="card-favorite-btn" data-action="favorite" aria-label="Toggle Favorite">☆</button>
+                    <button class="card-favorite-btn btn-icon secondary" data-action="favorite" aria-label="Toggle Favorite">☆</button>
                 </div>
                 <div class="card-content">
                     <p class="card-description"></p>
@@ -259,7 +301,7 @@
             <div class="card-actions">
                 <button class="card-start-btn" data-action="start">Start</button>
                 <div class="settings-menu-wrapper">
-                    <button class="card-settings-btn" data-action="toggle-menu" tabindex="0" aria-label="Workout Settings">
+                    <button class="card-settings-btn btn-icon secondary" data-action="toggle-menu" tabindex="0" aria-label="Workout Settings">
                         <svg class="settings-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                             <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
                         </svg>
@@ -281,9 +323,9 @@
             <div class="step-header">
                 <h4></h4>
                 <div class="step-controls">
-                    <button data-action="move-up" aria-label="Move step up">▲</button>
-                    <button data-action="move-down" aria-label="Move step down">▼</button>
-                    <button data-action="delete" class="danger" aria-label="Delete step">&times;</button>
+                    <button class="secondary btn-icon btn-sm" data-action="move-up" aria-label="Move step up">▲</button>
+                    <button class="secondary btn-icon btn-sm" data-action="move-down" aria-label="Move step down">▼</button>
+                    <button class="danger btn-icon btn-sm" data-action="delete" aria-label="Delete step">&times;</button>
                 </div>
             </div>
             <div class="grid-2">
