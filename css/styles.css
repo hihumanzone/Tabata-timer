@@ -1,6 +1,6 @@
 /* --- General & Variables --- */
 :root {
-    --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     
     /* Dynamic viewport height - will be set by JavaScript */
     --vh-dynamic: 100vh;
@@ -54,6 +54,45 @@ body[data-theme="high-contrast"] {
     --danger-color: #ff453a;
 }
 
+body[data-theme="oceanic"] {
+    --bg-primary: #f0f7f8;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #e1eef0;
+    --text-primary: #0b2530;
+    --text-secondary: #5a7a85;
+    --accent-primary: #008c9e;
+    --accent-secondary: #e1eef0;
+    --border-color: #cddce0;
+    --shadow-color: rgba(11, 37, 48, 0.1);
+    --danger-color: #e5484d;
+}
+
+body[data-theme="terra"] {
+    --bg-primary: #f5f3f0;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #e8e5e1;
+    --text-primary: #3d352e;
+    --text-secondary: #8a7d72;
+    --accent-primary: #6a994e;
+    --accent-secondary: #e8e5e1;
+    --border-color: #dcd8d3;
+    --shadow-color: rgba(61, 53, 46, 0.1);
+    --danger-color: #e5484d;
+}
+
+body[data-theme="minty"] {
+    --bg-primary: #f2fcf9;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #e3f8f1;
+    --text-primary: #1a2b25;
+    --text-secondary: #5e7a70;
+    --accent-primary: #34d399;
+    --accent-secondary: #e3f8f1;
+    --border-color: #d1e9e2;
+    --shadow-color: rgba(26, 43, 37, 0.1);
+    --danger-color: #e5484d;
+}
+
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -71,7 +110,6 @@ body {
 .hidden { display: none !important; }
 
 .app-container {
-    max-width: 1200px;
     margin: 0 auto;
     padding: 1rem;
 }
@@ -79,35 +117,74 @@ body {
 /* --- Buttons & Inputs --- */
 button, .button {
     font-family: inherit;
+    font-weight: 600;
     font-size: 1rem;
     padding: 0.75rem 1.25rem;
-    border: none;
-    border-radius: 8px;
+    border: 1px solid transparent;
+    border-radius: 6px;
     cursor: pointer;
     background-color: var(--accent-primary);
     color: white;
-    transition: background-color 0.2s, transform 0.1s, opacity 0.2s;
+    transition: all 0.2s ease;
     text-decoration: none;
     display: inline-block;
     text-align: center;
+    box-shadow: 0 1px 2px var(--shadow-color);
 }
 
-button:hover { background-color: color-mix(in srgb, var(--accent-primary), #000 10%); }
-button:active { transform: scale(0.98); }
+button:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--accent-primary), #fff 15%);
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transform: translateY(-1px);
+}
+button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px var(--shadow-color);
+    background-color: color-mix(in srgb, var(--accent-primary), #000 10%);
+}
 button:disabled {
     background-color: var(--bg-tertiary);
     color: var(--text-secondary);
     cursor: not-allowed;
     opacity: 0.7;
+    box-shadow: none;
 }
 button.primary {
     font-size: 1.2rem;
     padding: 1rem 2rem;
 }
-button.secondary { background-color: var(--bg-tertiary); color: var(--text-primary); }
-button.secondary:hover:not(:disabled) { background-color: var(--border-color); }
-button.danger { background-color: var(--danger-color); }
-button.danger:hover { background-color: color-mix(in srgb, var(--danger-color), #000 10%); }
+button.secondary {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+button.secondary:hover:not(:disabled) {
+    background-color: var(--bg-tertiary);
+    border-color: color-mix(in srgb, var(--border-color), #000 20%);
+}
+button.danger {
+    background-color: var(--danger-color);
+    color: white;
+    border-color: transparent;
+}
+button.danger:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--danger-color), #fff 15%);
+}
+
+button.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem; /* 40px */
+    height: 2.5rem; /* 40px */
+    padding: 0;
+}
+
+button.btn-sm {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.9rem;
+}
 
 /* Settings Icon */
 .settings-icon {
@@ -125,14 +202,16 @@ input, select, textarea {
     font-size: 1rem;
     padding: 0.75rem;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 6px;
     background-color: var(--bg-secondary);
     color: var(--text-primary);
     width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 input:focus, select:focus, textarea:focus {
-    outline: 2px solid var(--accent-primary);
+    outline: none;
     border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary), transparent 80%);
 }
 
 .form-group { margin-bottom: 1rem; }
@@ -192,6 +271,9 @@ form button[type="submit"] {
 .theme-light { background: linear-gradient(45deg, #f4f7f9 50%, #fff 50%); }
 .theme-dark { background: linear-gradient(45deg, #1c1c1e 50%, #2c2c2e 50%); }
 .theme-high-contrast { background: linear-gradient(45deg, #000 50%, #121212 50%); }
+.theme-oceanic { background: linear-gradient(45deg, #f0f7f8 50%, #fff 50%); }
+.theme-terra { background: linear-gradient(45deg, #f5f3f0 50%, #fff 50%); }
+.theme-minty { background: linear-gradient(45deg, #f2fcf9 50%, #fff 50%); }
 
 /* --- Home Screen --- */
 .home-header {
@@ -229,17 +311,20 @@ form button[type="submit"] {
 
 .workout-card {
     background-color: var(--bg-secondary);
-    border-radius: 12px;
-    box-shadow: 0 4px 15px var(--shadow-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border-left: 5px solid var(--color-tag, var(--accent-primary));
-    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 6px solid var(--color-tag, var(--accent-primary));
+    transition: all 0.2s ease-in-out;
     animation: fadeIn 0.4s ease-out forwards;
 }
-.workout-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px var(--shadow-color); }
+.workout-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
+}
 
 .card-main-content {
     display: flex;
@@ -1019,4 +1104,11 @@ form button[type="submit"] {
     font-size: 0.9rem;
     color: var(--text-secondary);
     font-weight: normal;
+}
+
+.divider {
+    border: none;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 1.5rem 0;
 }
