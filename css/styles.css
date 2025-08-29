@@ -1,4 +1,3 @@
-/* --- General & Variables --- */
 :root {
     --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --accent-text-color: white;
@@ -18,7 +17,6 @@
     --color-purple: #af52de;
 }
 
-/* --- Base Themes --- */
 body[data-theme="light"] {
     --bg-primary: #f4f7f9;
     --bg-secondary: #ffffff;
@@ -49,9 +47,6 @@ body[data-theme="amoled"] {
     --shadow-color: rgba(0, 0, 0, 0.5);
 }
 
-/* --- Color Palettes --- */
-
-/* Default Palette */
 body[data-palette="default"] {
     --accent-primary: #007aff;
     --danger-color: #ff3b30;
@@ -62,7 +57,6 @@ body[data-theme="amoled"][data-palette="default"] {
     --danger-color: #ff453a;
 }
 
-/* Oceanic Palette */
 body[data-palette="oceanic"] {
     --accent-primary: #008c9e;
     --danger-color: #e5484d;
@@ -70,10 +64,9 @@ body[data-palette="oceanic"] {
 body[data-theme="dark"][data-palette="oceanic"],
 body[data-theme="amoled"][data-palette="oceanic"] {
     --accent-primary: #38bdf8; /* Lighter sky blue */
-    --accent-text-color: #1c1c1e; /* Dark text for light accent */
+    --accent-text-color: #1c1c1e;
 }
 
-/* Terra Palette */
 body[data-palette="terra"] {
     --accent-primary: #6a994e;
     --danger-color: #e5484d;
@@ -81,10 +74,9 @@ body[data-palette="terra"] {
 body[data-theme="dark"][data-palette="terra"],
 body[data-theme="amoled"][data-palette="terra"] {
     --accent-primary: #a3e635; /* Lime green */
-    --accent-text-color: #1c1c1e; /* Dark text for light accent */
+    --accent-text-color: #1c1c1e;
 }
 
-/* Minty Palette */
 body[data-palette="minty"] {
     --accent-primary: #34d399;
     --danger-color: #e5484d;
@@ -92,7 +84,7 @@ body[data-palette="minty"] {
 body[data-theme="dark"][data-palette="minty"],
 body[data-theme="amoled"][data-palette="minty"] {
     --accent-primary: #6ee7b7; /* Brighter mint */
-    --accent-text-color: #1c1c1e; /* Dark text for light accent */
+    --accent-text-color: #1c1c1e;
 }
 
 *, *::before, *::after {
@@ -116,7 +108,6 @@ body {
     padding: 1rem;
 }
 
-/* --- Buttons & Inputs --- */
 button, .button {
     font-family: inherit;
     font-weight: 600;
@@ -188,7 +179,6 @@ button.btn-sm {
     font-size: 0.9rem;
 }
 
-/* Settings Icon */
 .settings-icon {
     display: inline-block;
     vertical-align: middle;
@@ -219,7 +209,6 @@ input:focus, select:focus, textarea:focus {
 .form-group { margin-bottom: 1rem; }
 .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
 
-/* Form button alignment */
 form button[type="submit"] {
     display: block;
     margin: 1.5rem auto 0 auto;
@@ -235,7 +224,6 @@ form button[type="submit"] {
     min-width: 150px;
 }
 
-/* --- Modals --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -263,7 +251,6 @@ form button[type="submit"] {
 .modal-header h2 { margin: 0; }
 .modal-close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); }
 
-/* --- Setup Screen --- */
 #setupScreen .modal-content { max-width: 400px; }
 #setupScreen .theme-options { display: flex; justify-content: space-around; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
 #setupScreen .theme-option { text-align: center; cursor: pointer; }
@@ -278,8 +265,6 @@ form button[type="submit"] {
 .palette-terra { background-color: #6a994e; }
 .palette-minty { background-color: #34d399; }
 
-
-/* --- Home Screen --- */
 .home-header {
     display: flex;
     flex-wrap: wrap;
@@ -301,7 +286,6 @@ form button[type="submit"] {
 }
 .search-sort-container > * { flex: 1 1 200px; }
 
-/* Workout Cards */
 .workout-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -400,7 +384,6 @@ form button[type="submit"] {
     margin-top: 0;
 }
 
-/* --- Workout Editor --- */
 #editorScreen {
     position: fixed;
     top: 0; left: 0;
@@ -448,7 +431,6 @@ form button[type="submit"] {
 .step-controls button:disabled { opacity: 0.3; cursor: not-allowed; }
 .step-controls button.hidden { opacity: 0; pointer-events: none; }
 
-/* --- Timer Screen --- */
 #timerScreen {
     position: fixed;
     top: 0; left: 0;
@@ -546,7 +528,6 @@ form button[type="submit"] {
 
 .timer-controls { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
 
-/* Responsive */
 .timer-details-wrapper {
     display: flex;
     flex-direction: column;
@@ -622,7 +603,6 @@ form button[type="submit"] {
     }
 }
 
-/* --- Custom Modal System --- */
 .custom-modal-overlay {
     position: fixed;
     top: 0;
@@ -693,7 +673,6 @@ form button[type="submit"] {
     min-width: 80px;
 }
 
-/* Workout Completion Modal */
 .workout-complete-modal .custom-modal-content {
     max-width: 600px;
     text-align: center;
@@ -748,7 +727,6 @@ form button[type="submit"] {
     min-width: 150px;
 }
 
-/* --- Custom Notification System --- */
 .notifications-container {
     position: fixed;
     top: 1rem;
@@ -827,7 +805,6 @@ form button[type="submit"] {
     color: var(--text-primary);
 }
 
-/* Notification types */
 .notification-success {
     border-left-color: var(--color-green);
 }
@@ -860,7 +837,6 @@ form button[type="submit"] {
     color: var(--accent-primary);
 }
 
-/* --- Custom Dropdown Component --- */
 .custom-dropdown {
     position: relative;
     display: inline-block;
@@ -1006,7 +982,6 @@ form button[type="submit"] {
     outline: none !important;
 }
 
-/* Mobile responsiveness for notifications */
 @media (max-width: 480px) {
     .notifications-container {
         top: 1rem;
@@ -1021,7 +996,6 @@ form button[type="submit"] {
     }
 }
 
-/* Workout Progress Modal */
 .workout-progress-modal .custom-modal-content {
     max-width: 600px;
     max-height: 80vh;
