@@ -221,7 +221,7 @@ export const UI = {
 
     updateFullscreenButton() {
         const btn = this.elements.timerFullscreenBtn;
-        btn.textContent = document.fullscreenElement ? 'Exit Fullscreen ↙️' : 'Fullscreen ↗️';
+        btn.textContent = document.fullscreenElement ? '↙️' : '↗️';
     },
 
     closeAllModals() {
