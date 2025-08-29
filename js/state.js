@@ -5,6 +5,7 @@ export const State = {
     settings: {
         username: '',
         theme: 'light',
+        palette: 'default',
         view: 'grid'
     },
     workouts: [],

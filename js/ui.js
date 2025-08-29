@@ -20,7 +20,7 @@ export const UI = {
             'timerMediaContainer', 'timerCountdown', 'timerReps', 'timerDescription', 'timerDoneBtn',
             'timerStepProgress', 'timerOverallProgress', 'timerOverallProgressBar', 'timerPauseResumeBtn',
             'timerQuitBtn', 'timerPrevBtn', 'timerSkipBtn', 'timerProgressBtn', 'timerFullscreenBtn',
-            'mainSettingsModal', 'mainSettingsForm', 'settingsUsername', 'settingsTheme',
+            'mainSettingsModal', 'mainSettingsForm', 'settingsUsername', 'settingsTheme', 'settingsPalette',
             'settingsView', 'exportUserDataBtn', 'importUserDataBtn', 'previewModal',
             'previewTitle', 'previewContent'
         ];
@@ -32,6 +32,7 @@ export const UI = {
 
     applySettings() {
         document.body.dataset.theme = State.settings.theme;
+        document.body.dataset.palette = State.settings.palette;
         this.elements.welcomeMessage.textContent = `Welcome, ${State.settings.username}!`;
         this.elements.workoutList.className = `workout-list ${State.settings.view === 'list' ? 'list-view' : ''}`;
     },
