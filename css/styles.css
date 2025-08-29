@@ -866,17 +866,14 @@ form button[type="submit"] {
     user-select: none;
 }
 
-.custom-dropdown-trigger:hover {
-    border-color: var(--accent-primary);
-}
-
 .custom-dropdown-trigger:focus {
     outline: none;
     border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary), transparent 80%);
 }
 
-.custom-dropdown-trigger:active {
+button.custom-dropdown-trigger:hover,
+button.custom-dropdown-trigger:active {
     background-color: var(--bg-secondary);
     border-color: var(--accent-primary);
 }
