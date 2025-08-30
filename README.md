@@ -71,9 +71,9 @@ You can import and export all your settings and workouts using a single JSON fil
 ```json
 {
   "settings": {
-    "username": "Jules",
+    "username": "Jack",
     "theme": "dark",
-    "palette": "default",
+    "palette": "minty",
     "view": "grid"
   },
   "workouts": [
@@ -83,10 +83,10 @@ You can import and export all your settings and workouts using a single JSON fil
       "description": "Core workout with all features enabled.",
       "color": "blue",
       "prepare": 5,
-      "prepareMedia": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif",
+      "prepareMedia": "https://hips.hearstapps.com/hmg-prod/images/muscular-hispanic-man-doing-plank-on-the-beach-at-royalty-free-image-1680697280.jpg?crop=1.00xw:1.00xh;0,0&resize=1024:*",
       "sets": 2,
       "cooldown": 10,
-      "cooldownMedia": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif",
+      "cooldownMedia": "https://i.pinimg.com/originals/c1/b9/ab/c1b9ab7396615778f2a0903d420cd10f.gif",
       "steps": [
         {
           "id": "s-1756570781687",
@@ -143,10 +143,10 @@ You can import and export all your settings and workouts using a single JSON fil
       "description": "A workout for your legs.",
       "color": "yellow",
       "prepare": 10,
-      "prepareMedia": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif",
+      "prepareMedia": "https://shop.bodybuilding.com/cdn/shop/articles/leg-workouts-for-men-get-thicker-quads-glutes-and-hams-986493.jpg?v=1737673309&width=1080",
       "sets": 3,
       "cooldown": 15,
-      "cooldownMedia": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif",
+      "cooldownMedia": "https://i.pinimg.com/originals/c1/b9/ab/c1b9ab7396615778f2a0903d420cd10f.gif",
       "steps": [
         {
           "id": "s-1756570782786",
@@ -195,7 +195,7 @@ You can import and export all your settings and workouts using a single JSON fil
         }
       ],
       "createdAt": 1756570783303,
-      "isFavorite": false
+      "isFavorite": true
     },
     {
       "id": "w-1756570784232",
@@ -203,10 +203,10 @@ You can import and export all your settings and workouts using a single JSON fil
       "description": "A workout for your upper body.",
       "color": "purple",
       "prepare": 12,
-      "prepareMedia": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif",
+      "prepareMedia": "https://workoutlabs.com/train/wp-content/uploads/2023/05/Dumbbell_Lateral_Raise_Power-Partials_F_WorkoutLabs-c.svg",
       "sets": 3,
       "cooldown": 20,
-      "cooldownMedia": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif",
+      "cooldownMedia": "https://i.pinimg.com/originals/c1/b9/ab/c1b9ab7396615778f2a0903d420cd10f.gif",
       "steps": [
         {
           "id": "s-1756570783770",
