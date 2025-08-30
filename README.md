@@ -78,183 +78,183 @@ You can import and export all your settings and workouts using a single JSON fil
   },
   "workouts": [
     {
-      "id": "w-1756567003040",
+      "id": "w-1756570782310",
       "title": "Full-Featured Core",
       "description": "Core workout with all features enabled.",
       "color": "blue",
       "prepare": 5,
-      "prepareMedia": "https://gymvisual.com/img/p/4/7/3/1/4731.gif",
+      "prepareMedia": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif",
       "sets": 2,
       "cooldown": 10,
-      "cooldownMedia": "https://gymvisual.com/img/p/2/0/8/2/5/20825.gif",
+      "cooldownMedia": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif",
       "steps": [
         {
-          "id": "s-1756567002385",
+          "id": "s-1756570781687",
           "type": "work",
           "name": "Sit-ups (Reps)",
           "description": "",
           "duration": 0,
           "reps": 20,
-          "media": "https://gymvisual.com/img/p/4/7/3/1/4731.gif"
+          "media": "https://gymvisual.com/img/p/2/1/5/7/0/21570.gif"
         },
         {
-          "id": "s-1756567002502",
+          "id": "s-1756570781819",
           "type": "rest",
           "name": "Rest",
           "description": "",
           "duration": 10,
           "reps": 0,
-          "media": "https://gymvisual.com/img/p/5/8/7/9/5879.gif"
+          "media": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif"
         },
         {
-          "id": "s-1756567002623",
+          "id": "s-1756570781938",
           "type": "work",
           "name": "Crunches (Time)",
           "description": "",
           "duration": 30,
           "reps": 0,
-          "media": "https://gymvisual.com/img/p/5/8/7/9/5879.gif"
+          "media": "https://gymvisual.com/img/p/2/7/0/1/4/27014.gif"
         },
         {
-          "id": "s-1756567002773",
+          "id": "s-1756570782072",
           "type": "rest",
           "name": "Rest",
           "description": "",
           "duration": 10,
           "reps": 0,
-          "media": "https://gymvisual.com/img/p/4/7/3/1/4731.gif"
+          "media": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif"
         },
         {
-          "id": "s-1756567002906",
+          "id": "s-1756570782187",
           "type": "work",
           "name": "Extensions (Time+Reps)",
           "description": "",
           "duration": 30,
           "reps": 15,
-          "media": "https://gymvisual.com/img/p/2/0/8/2/5/20825.gif"
+          "media": "https://gymvisual.com/img/p/1/8/6/7/0/18670.gif"
         }
       ],
-      "createdAt": 1756567003040,
+      "createdAt": 1756570782310,
       "isFavorite": false
     },
     {
-      "id": "w-1756567004089",
+      "id": "w-1756570783303",
       "title": "Leg Day Special",
       "description": "A workout for your legs.",
       "color": "yellow",
       "prepare": 10,
-      "prepareMedia": "https://gymvisual.com/img/p/4/7/3/1/4731.gif",
+      "prepareMedia": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif",
       "sets": 3,
       "cooldown": 15,
-      "cooldownMedia": "https://gymvisual.com/img/p/2/0/8/2/5/20825.gif",
+      "cooldownMedia": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif",
       "steps": [
         {
-          "id": "s-1756567003538",
+          "id": "s-1756570782786",
           "type": "work",
           "name": "Squats",
           "description": "",
           "duration": 45,
           "reps": 0,
-          "media": "https://gymvisual.com/img/p/4/7/3/1/4731.gif"
+          "media": "https://gymvisual.com/img/p/2/5/2/5/6/25256.gif"
         },
         {
-          "id": "s-1756567003634",
+          "id": "s-1756570782886",
           "type": "rest",
           "name": "Rest",
           "description": "",
           "duration": 15,
           "reps": 0,
-          "media": "https://gymvisual.com/img/p/5/8/7/9/5879.gif"
+          "media": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif"
         },
         {
-          "id": "s-1756567003738",
+          "id": "s-1756570783000",
           "type": "work",
           "name": "Lunges (Reps)",
           "description": "",
           "duration": 0,
           "reps": 15,
-          "media": "https://gymvisual.com/img/p/5/8/7/9/5879.gif"
+          "media": "https://gymvisual.com/img/p/2/2/5/9/0/22590.gif"
         },
         {
-          "id": "s-1756567003854",
+          "id": "s-1756570783103",
           "type": "rest",
           "name": "Rest",
           "description": "",
           "duration": 15,
           "reps": 0,
-          "media": "https://gymvisual.com/img/p/2/0/8/2/5/20825.gif"
+          "media": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif"
         },
         {
-          "id": "s-1756567003971",
+          "id": "s-1756570783199",
           "type": "work",
           "name": "Calf Raises (Time+Reps)",
           "description": "",
           "duration": 30,
           "reps": 20,
-          "media": "https://gymvisual.com/img/p/2/0/8/2/5/20825.gif"
+          "media": "https://gymvisual.com/img/p/2/9/0/3/1/29031.gif"
         }
       ],
-      "createdAt": 1756567004089,
+      "createdAt": 1756570783303,
       "isFavorite": false
     },
     {
-      "id": "w-1756567005117",
+      "id": "w-1756570784232",
       "title": "Upper Body Blast",
       "description": "A workout for your upper body.",
       "color": "purple",
       "prepare": 12,
-      "prepareMedia": "https://gymvisual.com/img/p/2/0/8/2/5/20825.gif",
+      "prepareMedia": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif",
       "sets": 3,
       "cooldown": 20,
-      "cooldownMedia": "https://gymvisual.com/img/p/4/7/3/1/4731.gif",
+      "cooldownMedia": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif",
       "steps": [
         {
-          "id": "s-1756567004621",
+          "id": "s-1756570783770",
           "type": "work",
           "name": "Push-ups (Reps)",
           "description": "",
           "duration": 0,
           "reps": 10,
-          "media": "https://gymvisual.com/img/p/2/0/8/2/5/20825.gif"
+          "media": "https://gymvisual.com/img/p/1/7/3/1/3/17313.gif"
         },
         {
-          "id": "s-1756567004739",
+          "id": "s-1756570783868",
           "type": "rest",
           "name": "Rest",
           "description": "",
           "duration": 20,
           "reps": 0,
-          "media": "https://gymvisual.com/img/p/5/8/7/9/5879.gif"
+          "media": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif"
         },
         {
-          "id": "s-1756567004851",
+          "id": "s-1756570783967",
           "type": "work",
           "name": "Bicep Curls",
           "description": "",
           "duration": 40,
           "reps": 0,
-          "media": "https://gymvisual.com/img/p/5/8/7/9/5879.gif"
+          "media": "https://gymvisual.com/img/p/4/7/3/6/4736.gif"
         },
         {
-          "id": "s-1756567004934",
+          "id": "s-1756570784050",
           "type": "rest",
           "name": "Rest",
           "description": "",
           "duration": 20,
           "reps": 0,
-          "media": "https://gymvisual.com/img/p/4/7/3/1/4731.gif"
+          "media": "https://upload.wikimedia.org/wikipedia/commons/5/59/Nature.gif"
         },
         {
-          "id": "s-1756567005016",
+          "id": "s-1756570784132",
           "type": "work",
           "name": "Shoulder Press (Time+Reps)",
           "description": "",
           "duration": 40,
           "reps": 12,
-          "media": "https://gymvisual.com/img/p/4/7/3/1/4731.gif"
+          "media": "https://gymvisual.com/img/p/1/4/6/6/0/14660.gif"
         }
       ],
-      "createdAt": 1756567005117,
+      "createdAt": 1756570784232,
       "isFavorite": false
     }
   ]
